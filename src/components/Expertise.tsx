@@ -274,14 +274,14 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
   return (
     <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
       <motion.div className="flex whitespace-nowrap gap-4 flex-nowrap" style={{ x }}>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
-        <span className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
       </motion.div>
     </div>
   );
@@ -289,13 +289,13 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
 
 export function Expertise() {
   return (
-    <section id="expertise" className="pt-0 pb-4 bg-white overflow-hidden relative">
+    <section id="expertise" className="py-0 pb-10 relative overflow-hidden w-full">
       {/* Premium Divider / Parallax Text */}
-      <div className="relative py-8 mb-4">
+      <div className="relative py-4 mb-2 w-full pointer-events-none z-0">
         <ParallaxText baseVelocity={-1}>EXPERTISE • </ParallaxText>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10 w-full">
         {/* Simulated Mac Window */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -333,7 +333,7 @@ export function Expertise() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-2xl font-bold text-zinc-950 tracking-tight">
+                  <h3 className="text-2xl font-medium text-zinc-900 tracking-tight">
                     {area.title}
                   </h3>
                   <p className="text-zinc-500 leading-relaxed font-light text-sm md:text-base">

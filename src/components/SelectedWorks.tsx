@@ -40,7 +40,7 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
     <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
       <motion.div className="flex whitespace-nowrap gap-4 flex-nowrap" style={{ x }}>
         {[...Array(8)].map((_, i) => (
-          <span key={i} className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>
+          <span key={i} className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
             {children}{" "}
           </span>
         ))}
@@ -107,7 +107,7 @@ export function SelectedWorks() {
   const activeWork = works.find(w => w.id === activeId) || works[0];
 
   return (
-    <section id="works" className="pt-0 pb-0 bg-white overflow-hidden relative">
+    <section id="works" className="py-0 pb-10 relative overflow-hidden w-full">
       <AnimatePresence>
         {selectedProject && (
           <ProjectDetail work={selectedProject} onClose={() => setSelectedProject(null)} />
@@ -115,11 +115,11 @@ export function SelectedWorks() {
       </AnimatePresence>
 
       {/* Parallax Text Header */}
-      <div className="relative py-8">
+      <div className="relative py-4 mb-2 w-full pointer-events-none z-0">
         <ParallaxText baseVelocity={1}>PROGETTI • </ParallaxText>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10 w-full">
         {/* Creative Container - White Theme, No Window Controls */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -157,7 +157,7 @@ export function SelectedWorks() {
                     )}
                   </div>
 
-                  <h3 className={`text-lg font-bold transition-colors ${activeId === work.id ? "text-black" : "text-zinc-400 group-hover:text-zinc-600"}`}>
+                  <h3 className={`text-lg font-medium transition-colors ${activeId === work.id ? "text-zinc-900" : "text-zinc-400 group-hover:text-zinc-600"}`}>
                     {work.title}
                   </h3>
                   <p className="text-xs text-zinc-400 mt-1 font-medium">{work.category}</p>
@@ -213,7 +213,7 @@ export function SelectedWorks() {
                         </span>
                       ))}
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-black tracking-tight">
+                    <h2 className="text-2xl md:text-3xl font-medium text-zinc-900 tracking-tight">
                       {activeWork.title}
                     </h2>
                     <p className="text-zinc-500 text-sm max-w-md leading-relaxed">

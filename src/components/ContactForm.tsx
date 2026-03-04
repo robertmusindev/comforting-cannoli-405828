@@ -62,7 +62,7 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
     <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
       <motion.div className="flex whitespace-nowrap gap-4 flex-nowrap" style={{ x }}>
         {[...Array(8)].map((_, i) => (
-          <span key={i} className="block text-4xl md:text-6xl font-bold uppercase leading-[0.85] tracking-tighter text-white" style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.5)" }}>
+          <span key={i} className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
             {children}{" "}
           </span>
         ))}
@@ -124,7 +124,7 @@ export function ContactForm() {
   };
 
   return (
-    <section id="contact" className="pt-32 pb-16 px-6 md:px-12 lg:px-24 bg-zinc-50 relative overflow-hidden flex-grow flex flex-col justify-center">
+    <section id="contact" className="py-0 pb-10 relative overflow-hidden w-full">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-3xl opacity-50" />
@@ -132,11 +132,11 @@ export function ContactForm() {
       </div>
 
       {/* Parallax Text Header */}
-      <div className="absolute top-0 left-0 w-full py-8 pointer-events-none z-0">
+      <div className="relative py-4 mb-2 w-full pointer-events-none z-0">
         <ParallaxText baseVelocity={1}>CONTATTI • </ParallaxText>
       </div>
 
-      <div className="max-w-5xl mx-auto relative z-10 w-full">
+      <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-24 relative z-10 w-full">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -148,7 +148,7 @@ export function ContactForm() {
             {/* Left Panel: Info & Context */}
             <div className="lg:col-span-2 bg-white text-black p-10 flex flex-col justify-between relative overflow-hidden border-b lg:border-r lg:border-b-0 border-zinc-100">
               <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">
+                <h2 className="text-3xl md:text-4xl font-medium tracking-tight mb-6 text-zinc-900">
                   Iniziamo un progetto insieme.
                 </h2>
                 <p className="text-zinc-600 font-light leading-relaxed mb-8">
