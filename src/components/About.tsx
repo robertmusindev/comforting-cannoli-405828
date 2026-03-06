@@ -4,13 +4,13 @@ import { motion, useScroll, useTransform, useInView } from "motion/react";
 /* ─── NEURAL BACKGROUND COMPONENT ─── */
 const NeuralBackground = () => {
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-40 mix-blend-multiply flex items-center justify-center">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 flex items-center justify-center">
             {/* Soft glowing ambient orb */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-zinc-200/50 rounded-full blur-[120px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-zinc-100 rounded-full blur-[100px] opacity-60" />
 
             {/* Neural SVG Layer */}
             <svg
-                className="absolute w-[140%] h-[140%] md:w-full md:h-[120%] opacity-30"
+                className="absolute w-[140%] h-[140%] md:w-full md:h-[120%] opacity-100"
                 viewBox="0 0 1000 600"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -19,8 +19,8 @@ const NeuralBackground = () => {
                 {/* Horizontal flow line 1 */}
                 <path
                     d="M-100,200 C150,300 350,100 600,250 C850,400 1100,100 1300,250"
-                    stroke="rgba(0,0,0,0.15)"
-                    strokeWidth="1"
+                    stroke="rgba(0,0,0,0.25)"
+                    strokeWidth="1.5"
                     strokeDasharray="4 12"
                     className="neural-wave-1"
                 />
@@ -28,8 +28,8 @@ const NeuralBackground = () => {
                 {/* Horizontal flow line 2 */}
                 <path
                     d="M-50,400 C200,300 400,500 700,350 C950,200 1100,450 1250,350"
-                    stroke="rgba(0,0,0,0.1)"
-                    strokeWidth="1.5"
+                    stroke="rgba(0,0,0,0.2)"
+                    strokeWidth="2"
                     strokeDasharray="8 16"
                     className="neural-wave-2"
                 />
@@ -37,21 +37,21 @@ const NeuralBackground = () => {
                 {/* Vertical connecting fibers */}
                 <path
                     d="M300,-100 Q350,250 250,700"
-                    stroke="rgba(0,0,0,0.08)"
-                    strokeWidth="1"
+                    stroke="rgba(0,0,0,0.15)"
+                    strokeWidth="1.5"
                     className="neural-wave-3"
                 />
                 <path
                     d="M750,-100 Q650,300 800,700"
-                    stroke="rgba(0,0,0,0.05)"
+                    stroke="rgba(0,0,0,0.1)"
                     strokeWidth="2"
                     className="neural-wave-4"
                 />
 
                 {/* Pulsing Nodes at Intersections */}
-                <circle cx="310" cy="165" r="3" fill="rgba(0,0,0,0.3)" className="neural-node pulse-delay-1" />
-                <circle cx="715" cy="340" r="4" fill="rgba(0,0,0,0.2)" className="neural-node pulse-delay-2" />
-                <circle cx="585" cy="245" r="2" fill="rgba(0,0,0,0.4)" className="neural-node pulse-delay-3" />
+                <circle cx="310" cy="165" r="4" fill="rgba(0,0,0,0.4)" className="neural-node pulse-delay-1" />
+                <circle cx="715" cy="340" r="5" fill="rgba(0,0,0,0.3)" className="neural-node pulse-delay-2" />
+                <circle cx="585" cy="245" r="3" fill="rgba(0,0,0,0.5)" className="neural-node pulse-delay-3" />
             </svg>
 
             {/* Fade out edges so it seamlessly blends into the white background */}
