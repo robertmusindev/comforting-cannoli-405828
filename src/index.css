@@ -181,29 +181,27 @@
 
 /* ===== Neural Background Animations ===== */
 .neural-wave-1 {
-  animation: wave-flow 25s ease-in-out infinite alternate;
-  will-change: transform;
+  animation: flow-dash 40s linear infinite;
+  stroke-dasharray: 40 120;
 }
 
 .neural-wave-2 {
-  animation: wave-flow-reverse 30s ease-in-out infinite alternate;
-  will-change: transform;
-  transform-origin: center;
+  animation: flow-dash-reverse 50s linear infinite;
+  stroke-dasharray: 80 160;
 }
 
 .neural-wave-3 {
-  animation: fiber-drift 20s ease-in-out infinite alternate;
-  will-change: transform;
+  animation: pulse-opacity 12s ease-in-out infinite alternate;
 }
 
 .neural-wave-4 {
-  animation: fiber-drift-reverse 22s ease-in-out infinite alternate;
-  will-change: transform;
+  animation: pulse-opacity-delayed 15s ease-in-out infinite alternate;
 }
 
 .neural-node {
   animation: node-pulse 4s ease-in-out infinite alternate;
-  will-change: opacity, transform;
+  transform-origin: center;
+  transform-box: fill-box;
 }
 
 .pulse-delay-1 {
@@ -218,54 +216,54 @@
   animation-delay: 2.5s;
 }
 
-@keyframes wave-flow {
+@keyframes flow-dash {
   0% {
-    transform: translate(-2%, -2%) scale(1);
+    stroke-dashoffset: 0;
   }
 
   100% {
-    transform: translate(2%, 2%) scale(1.05);
+    stroke-dashoffset: -320;
   }
 }
 
-@keyframes wave-flow-reverse {
+@keyframes flow-dash-reverse {
   0% {
-    transform: translate(2%, 2%) scale(1.05);
+    stroke-dashoffset: 480;
   }
 
   100% {
-    transform: translate(-2%, -2%) scale(1);
+    stroke-dashoffset: 0;
   }
 }
 
-@keyframes fiber-drift {
+@keyframes pulse-opacity {
   0% {
-    transform: translateY(-3%) rotate(-1deg);
+    opacity: 0.3;
   }
 
   100% {
-    transform: translateY(3%) rotate(1deg);
+    opacity: 1;
   }
 }
 
-@keyframes fiber-drift-reverse {
+@keyframes pulse-opacity-delayed {
   0% {
-    transform: translateY(3%) rotate(1deg);
+    opacity: 1;
   }
 
   100% {
-    transform: translateY(-3%) rotate(-1deg);
+    opacity: 0.2;
   }
 }
 
 @keyframes node-pulse {
   0% {
-    opacity: 0.2;
-    transform: scale(0.8);
+    opacity: 0.3;
+    transform: scale(0.9);
   }
 
   100% {
-    opacity: 0.8;
-    transform: scale(1.5);
+    opacity: 0.9;
+    transform: scale(1.3);
   }
 }
