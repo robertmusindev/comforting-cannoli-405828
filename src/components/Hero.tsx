@@ -16,228 +16,226 @@ const charVariants = {
 
 export function Hero() {
   const name = "Robert Musin";
-  const chars = name.split("");
+  const words = name.split(" ");
 
   return (
-    <section className="w-full bg-white relative overflow-hidden flex justify-center">
-      <div className="w-full max-w-[1440px] min-h-screen grid grid-cols-1 grid-rows-1 px-6 md:px-12 lg:px-24 text-center relative">
-        {/* ===== Animated Background Elements ===== */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden col-start-1 row-start-1">
-
-          {/* ===== Top-Left Corner Arc ===== */}
-          <motion.svg
-            className="absolute top-0 left-0 w-[55%] md:w-[40%] h-auto"
-            viewBox="0 0 500 500"
+    <section className="w-full bg-white relative overflow-hidden flex flex-col justify-center items-center min-h-[100svh]">
+      {/* ===== Animated Background Elements ===== */}
+      <div className="absolute inset-0 z-0 pointer-events-none w-full h-full">
+        {/* ===== Top-Left Corner Arc ===== */}
+        <motion.svg
+          className="absolute top-0 left-0 w-[55%] md:w-[40%] max-w-[800px] h-auto"
+          viewBox="0 0 500 500"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.6, duration: 1.2, ease: "easeOut" }}
+        >
+          <motion.path
+            d="M-20,0 Q-20,520 500,520"
+            stroke="rgba(0,0,0,0.08)"
+            strokeWidth="1.5"
+            strokeDasharray="8 6"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 3.6, duration: 1.2, ease: "easeOut" }}
-          >
-            <motion.path
-              d="M-20,0 Q-20,520 500,520"
-              stroke="rgba(0,0,0,0.08)"
-              strokeWidth="1.5"
-              strokeDasharray="8 6"
-              fill="none"
-              animate={{ strokeDashoffset: [0, -56] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.path
-              d="M-20,60 Q-20,460 440,460"
-              stroke="rgba(0,0,0,0.06)"
-              strokeWidth="1"
-              strokeDasharray="6 8"
-              fill="none"
-              animate={{ strokeDashoffset: [0, -56] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.path
-              d="M-20,120 Q-20,400 380,400"
-              stroke="rgba(0,0,0,0.04)"
-              strokeWidth="1"
-              strokeDasharray="4 10"
-              fill="none"
-              animate={{ strokeDashoffset: [0, -56] }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.svg>
-
-          {/* ===== Bottom-Right Corner Arc ===== */}
-          <motion.svg
-            className="absolute bottom-0 right-0 w-[55%] md:w-[40%] h-auto"
-            viewBox="0 0 500 500"
+            animate={{ strokeDashoffset: [0, -56] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.path
+            d="M-20,60 Q-20,460 440,460"
+            stroke="rgba(0,0,0,0.06)"
+            strokeWidth="1"
+            strokeDasharray="6 8"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 3.8, duration: 1.2, ease: "easeOut" }}
+            animate={{ strokeDashoffset: [0, -56] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.path
+            d="M-20,120 Q-20,400 380,400"
+            stroke="rgba(0,0,0,0.04)"
+            strokeWidth="1"
+            strokeDasharray="4 10"
+            fill="none"
+            animate={{ strokeDashoffset: [0, -56] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          />
+        </motion.svg>
+
+        {/* ===== Bottom-Right Corner Arc ===== */}
+        <motion.svg
+          className="absolute bottom-0 right-0 w-[55%] md:w-[40%] max-w-[800px] h-auto"
+          viewBox="0 0 500 500"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.8, duration: 1.2, ease: "easeOut" }}
+        >
+          <motion.path
+            d="M520,500 Q520,-20 0,-20"
+            stroke="rgba(0,0,0,0.08)"
+            strokeWidth="1.5"
+            strokeDasharray="8 6"
+            fill="none"
+            animate={{ strokeDashoffset: [0, 56] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.path
+            d="M520,440 Q520,40 60,40"
+            stroke="rgba(0,0,0,0.06)"
+            strokeWidth="1"
+            strokeDasharray="6 8"
+            fill="none"
+            animate={{ strokeDashoffset: [0, 56] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.path
+            d="M520,380 Q520,100 120,100"
+            stroke="rgba(0,0,0,0.04)"
+            strokeWidth="1"
+            strokeDasharray="4 10"
+            fill="none"
+            animate={{ strokeDashoffset: [0, 56] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          />
+        </motion.svg>
+
+        {/* Floating geometric shapes */}
+        <motion.div
+          className="absolute z-0"
+          style={{ top: '15%', left: '10%' }}
+          animate={{ y: [-10, 10, -10], rotate: [0, 10, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="w-[clamp(2rem,3vw,4rem)] h-[clamp(2rem,3vw,4rem)] border-2 border-black/15 rounded-md" />
+        </motion.div>
+
+        <motion.div
+          className="absolute z-0"
+          style={{ top: '25%', right: '15%' }}
+          animate={{ y: [10, -10, 10], rotate: [0, -15, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          <svg viewBox="0 0 20 20" fill="none" className="w-[clamp(1.75rem,2.5vw,3rem)] h-[clamp(1.75rem,2.5vw,3rem)]">
+            <line x1="10" y1="2" x2="10" y2="18" stroke="rgba(0,0,0,0.2)" strokeWidth="2" />
+            <line x1="2" y1="10" x2="18" y2="10" stroke="rgba(0,0,0,0.2)" strokeWidth="2" />
+          </svg>
+        </motion.div>
+
+        <motion.div
+          className="absolute z-0"
+          style={{ top: '45%', left: '8%' }}
+          animate={{ y: [-15, 15, -15] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        >
+          <svg viewBox="0 0 22 20" fill="none" className="w-[clamp(1.8rem,2.8vw,3.5rem)] h-[clamp(1.8rem,2.8vw,3.5rem)]">
+            <path d="M11 2L20 18H2L11 2Z" stroke="rgba(0,0,0,0.15)" strokeWidth="2" />
+          </svg>
+        </motion.div>
+
+        <motion.div
+          className="absolute z-0"
+          style={{ top: '40%', left: '85%' }}
+          animate={{ y: [-8, 8, -8], rotate: [0, 45, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        >
+          <svg viewBox="0 0 18 18" fill="none" className="w-[clamp(1.5rem,2.2vw,3rem)] h-[clamp(1.5rem,2.2vw,3rem)]">
+            <rect x="9" y="1" width="11" height="11" rx="1" stroke="rgba(0,0,0,0.15)" strokeWidth="2" transform="rotate(45 9 1)" />
+          </svg>
+        </motion.div>
+
+        {/* Pulsing accent dots */}
+        <div className="absolute w-[clamp(4px,0.8vw,12px)] h-[clamp(4px,0.8vw,12px)] bg-black/10 rounded-full" style={{ top: '30%', left: '20%', animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
+        <div className="absolute w-[clamp(4px,0.8vw,12px)] h-[clamp(4px,0.8vw,12px)] bg-black/10 rounded-full" style={{ top: '70%', right: '18%', animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite 1.5s' }} />
+        <div className="absolute w-[clamp(4px,0.8vw,12px)] h-[clamp(4px,0.8vw,12px)] bg-black/10 rounded-full" style={{ top: '45%', right: '25%', animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite 3s' }} />
+      </div>
+
+      {/* Core centered content */}
+      <div className="relative z-10 w-full px-[clamp(1.5rem,4vw,6rem)] flex flex-col items-center justify-center text-center">
+        <h1 className="text-[clamp(3rem,8vw,12rem)] font-medium tracking-tighter leading-none text-zinc-900 text-center">
+          {words.map((word, wordIndex) => (
+            <span key={wordIndex} className="inline-block whitespace-nowrap">
+              {word.split("").map((char, charIndex) => {
+                const i = wordIndex * 10 + charIndex;
+                return (
+                  <motion.span
+                    key={charIndex}
+                    custom={i}
+                    initial="hidden"
+                    animate="visible"
+                    variants={charVariants}
+                    className="inline-block"
+                  >
+                    {char}
+                  </motion.span>
+                );
+              })}
+              {wordIndex !== words.length - 1 && (
+                <span className="inline-block w-[0.25em]">&nbsp;</span>
+              )}
+            </span>
+          ))}
+        </h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20, filter: "blur(5px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ delay: 2.0, duration: 1, ease: "easeOut" }}
+          className="mt-[clamp(1.5rem,3vw,4rem)] text-[clamp(1.125rem,2.2vw,2.5rem)] text-zinc-500 max-w-[clamp(40rem,60vw,80rem)] font-light tracking-wide leading-relaxed"
+        >
+          Creative Technologist & AI Prototyper. <br className="hidden md:block" />
+          Sviluppo prodotti digitali che scalano.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.8, duration: 0.8, ease: "easeOut" }}
+          className="mt-[clamp(2.5rem,5vw,7rem)] flex flex-col sm:flex-row items-center gap-[clamp(1.5rem,2vw,3rem)]"
+        >
+          <a
+            href="#contact"
+            className="group relative inline-flex items-center justify-center px-[clamp(2rem,3vw,4rem)] py-[clamp(1rem,1.5vw,2rem)] text-[clamp(1rem,1.25vw,1.5rem)] bg-black text-white font-medium rounded-full overflow-hidden transition-transform hover:scale-105 active:scale-95"
           >
-            <motion.path
-              d="M520,500 Q520,-20 0,-20"
-              stroke="rgba(0,0,0,0.08)"
-              strokeWidth="1.5"
-              strokeDasharray="8 6"
-              fill="none"
-              animate={{ strokeDashoffset: [0, 56] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.path
-              d="M520,440 Q520,40 60,40"
-              stroke="rgba(0,0,0,0.06)"
-              strokeWidth="1"
-              strokeDasharray="6 8"
-              fill="none"
-              animate={{ strokeDashoffset: [0, 56] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.path
-              d="M520,380 Q520,100 120,100"
-              stroke="rgba(0,0,0,0.04)"
-              strokeWidth="1"
-              strokeDasharray="4 10"
-              fill="none"
-              animate={{ strokeDashoffset: [0, 56] }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.svg>
+            <span className="relative z-10">Parliamone</span>
+            <div className="absolute inset-0 bg-zinc-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+          </a>
+          <a
+            href="#works"
+            className="text-zinc-950 text-[clamp(1rem,1.25vw,1.5rem)] font-medium hover:text-zinc-600 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-zinc-950 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100"
+          >
+            Esplora i Progetti
+          </a>
+        </motion.div>
+      </div>
 
-          {/* Floating geometric shapes (Optimized for Mobile Visibility & 60fps & Bound to upper 60% of screen) */}
-
-          {/* Small hollow square */}
+      {/* Bottom elements */}
+      <div className="flex flex-col items-center pb-[clamp(1rem,2vw,3rem)] w-full absolute bottom-0 left-0">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.5, duration: 1 }}
+          className="flex flex-col items-center gap-2 mb-[clamp(0.5rem,1.5vw,2rem)]"
+        >
+          <span className="text-[clamp(0.6rem,0.8vw,1rem)] uppercase tracking-[0.3em] text-zinc-400 font-light">scroll</span>
           <motion.div
-            className="hero-float absolute z-0"
-            style={{ top: '15%', left: '10%' }}
-            animate={{ y: [-10, 10, -10], rotate: [0, 10, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="w-8 h-8 md:w-6 md:h-6 border-2 border-black/15 rounded-md" />
-          </motion.div>
-
-          {/* Small plus/cross */}
-          <motion.div
-            className="hero-float absolute z-0"
-            style={{ top: '25%', right: '15%' }}
-            animate={{ y: [10, -10, 10], rotate: [0, -15, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          >
-            <svg width="28" height="28" viewBox="0 0 20 20" fill="none" className="md:w-[20px] md:h-[20px]">
-              <line x1="10" y1="2" x2="10" y2="18" stroke="rgba(0,0,0,0.2)" strokeWidth="2" />
-              <line x1="2" y1="10" x2="18" y2="10" stroke="rgba(0,0,0,0.2)" strokeWidth="2" />
+            <svg viewBox="0 0 16 16" fill="none" className="w-[clamp(1rem,1.5vw,2rem)] h-[clamp(1rem,1.5vw,2rem)]">
+              <path d="M3 6L8 11L13 6" stroke="rgba(0,0,0,0.25)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </motion.div>
+        </motion.div>
 
-          {/* Small triangle */}
-          <motion.div
-            className="hero-float absolute z-0"
-            style={{ top: '45%', left: '8%' }}
-            animate={{ y: [-15, 15, -15] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          >
-            <svg width="30" height="28" viewBox="0 0 22 20" fill="none" className="md:w-[22px] md:h-[20px]">
-              <path d="M11 2L20 18H2L11 2Z" stroke="rgba(0,0,0,0.15)" strokeWidth="2" />
-            </svg>
-          </motion.div>
-
-          {/* Small diamond */}
-          <motion.div
-            className="hero-float absolute z-0"
-            style={{ top: '40%', left: '85%' }}
-            animate={{ y: [-8, 8, -8], rotate: [0, 45, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-          >
-            <svg width="24" height="24" viewBox="0 0 18 18" fill="none" className="md:w-[18px] md:h-[18px]">
-              <rect x="9" y="1" width="11" height="11" rx="1" stroke="rgba(0,0,0,0.15)" strokeWidth="2" transform="rotate(45 9 1)" />
-            </svg>
-          </motion.div>
-
-          {/* Pulsing accent dots */}
-          <div className="hero-pulse-dot" style={{ top: '30%', left: '20%' }} />
-          <div className="hero-pulse-dot" style={{ top: '70%', right: '18%', animationDelay: '1.5s' }} />
-          <div className="hero-pulse-dot" style={{ top: '45%', right: '25%', animationDelay: '3s' }} />
-        </div>
-
-        <div className="flex flex-col items-center relative z-10 w-full h-full min-h-screen col-start-1 row-start-1">
-          {/* Top spacer */}
-          <div className="flex-1" />
-
-          {/* Core centered content */}
-          <div className="max-w-5xl flex flex-col items-center text-center px-6">
-            <h1 className="text-5xl md:text-7xl lg:text-[6.5rem] font-medium tracking-tighter leading-none text-zinc-900 flex flex-wrap justify-center">
-              {chars.map((char, i) => (
-                <motion.span
-                  key={i}
-                  custom={i}
-                  initial="hidden"
-                  animate="visible"
-                  variants={charVariants}
-                  className={char === " " ? "w-[0.25em]" : "inline-block"}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20, filter: "blur(5px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ delay: 2.0, duration: 1, ease: "easeOut" }}
-              className="mt-8 text-lg md:text-2xl text-zinc-500 max-w-2xl font-light tracking-wide"
-            >
-              Creative Technologist & AI Prototyper. <br className="hidden md:block" />
-              Sviluppo prodotti digitali che scalano.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.8, duration: 0.8, ease: "easeOut" }}
-              className="mt-12 flex flex-col sm:flex-row items-center gap-6"
-            >
-              <a
-                href="#contact"
-                className="group relative inline-flex items-center justify-center px-8 py-4 bg-black text-white font-medium rounded-full overflow-hidden transition-transform hover:scale-105 active:scale-95"
-              >
-                <span className="relative z-10">Parliamone</span>
-                <div className="absolute inset-0 bg-zinc-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-              </a>
-              <a
-                href="#works"
-                className="text-zinc-950 font-medium hover:text-zinc-600 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-zinc-950 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100"
-              >
-                Esplora i Progetti
-              </a>
-            </motion.div>
-          </div>
-
-          {/* Bottom elements */}
-          <div className="flex flex-col items-center pb-4 md:pb-6 w-full mt-auto">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 3.5, duration: 1 }}
-              className="flex flex-col items-center gap-2 mb-6"
-            >
-              <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-light">scroll</span>
-              <motion.div
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 6L8 11L13 6" stroke="rgba(0,0,0,0.25)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 4.2, duration: 0.8, ease: "easeOut" }}
-            >
-              <TechTicker />
-            </motion.div>
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 4.2, duration: 0.8, ease: "easeOut" }}
+          className="w-full"
+        >
+          <TechTicker />
+        </motion.div>
       </div>
     </section>
   );
@@ -261,9 +259,9 @@ const TechTicker = () => {
   const allTechs = [...techs, ...techs, ...techs, ...techs];
 
   return (
-    <div className="w-[100vw] overflow-hidden mt-32 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+    <div className="w-[100vw] overflow-hidden mt-[clamp(0.5rem,1.5vw,2rem)] relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
       <motion.div
-        className="flex gap-16 md:gap-24 w-max pr-16 md:pr-24"
+        className="flex gap-[clamp(2rem,6vw,6rem)] w-max pr-[clamp(2rem,6vw,6rem)]"
         animate={{ x: ["0%", "-25%"] }}
         transition={{
           duration: 40,
@@ -275,17 +273,17 @@ const TechTicker = () => {
         {allTechs.map((tech, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 text-zinc-400 grayscale hover:grayscale-0 hover:text-black transition-all duration-500 cursor-default flex-shrink-0"
+            className="flex items-center gap-[clamp(0.5rem,1vw,1.5rem)] text-zinc-400 grayscale hover:grayscale-0 hover:text-black transition-all duration-500 cursor-default flex-shrink-0"
           >
-            <div className="w-8 h-8 md:w-10 md:h-10">{tech.icon}</div>
-            <span className="text-lg md:text-xl font-semibold tracking-tight">{tech.name}</span>
+            <div className="w-[clamp(1.5rem,2.5vw,3rem)] h-[clamp(1.5rem,2.5vw,3rem)]">{tech.icon}</div>
+            <span className="text-[clamp(1rem,1.5vw,2rem)] font-semibold tracking-tight">{tech.name}</span>
           </div>
         ))}
       </motion.div>
 
       {/* Gradient Masks for fade effect */}
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10" />
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10" />
+      <div className="absolute inset-y-0 left-0 w-[clamp(2rem,6vw,6rem)] bg-gradient-to-r from-white to-transparent z-10" />
+      <div className="absolute inset-y-0 right-0 w-[clamp(2rem,6vw,6rem)] bg-gradient-to-l from-white to-transparent z-10" />
     </div>
   );
 };

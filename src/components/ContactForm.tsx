@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { useForm } from "react-hook-form";
+import { ScrollContext } from "../App";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useVelocity, useAnimationFrame } from "motion/react";
@@ -32,7 +33,8 @@ const wrap = (min: number, max: number, v: number) => {
 
 function ParallaxText({ children, baseVelocity = 100 }: { children: string; baseVelocity: number }) {
   const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
+  const mainScrollContainer = useContext(ScrollContext);
+  const { scrollY } = useScroll({ container: mainScrollContainer || undefined });
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
     damping: 50,
@@ -59,10 +61,10 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
   });
 
   return (
-    <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
-      <motion.div className="flex whitespace-nowrap gap-4 flex-nowrap" style={{ x }}>
+    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap">
+      <motion.div className="flex whitespace-nowrap gap-[clamp(1rem,2vw,3rem)] flex-nowrap" style={{ x, willChange: 'transform' }}>
         {[...Array(8)].map((_, i) => (
-          <span key={i} className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
+          <span key={i} className="block text-[clamp(2.5rem,4vw,6rem)] font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
             {children}{" "}
           </span>
         ))}
@@ -124,34 +126,34 @@ export function ContactForm() {
   };
 
   return (
-    <section id="contact" className="py-0 pb-10 relative overflow-hidden w-full">
+    <section id="contact" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-3xl opacity-50" />
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-[100px] opacity-40 transform-gpu will-change-transform" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-[100px] opacity-40 transform-gpu will-change-transform" />
       </div>
 
       {/* Parallax Text Header */}
-      <div className="relative py-4 mb-2 w-full pointer-events-none z-0">
+      <div className="relative py-[clamp(0.5rem,1vw,1.5rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0">
         <ParallaxText baseVelocity={1}>CONTATTI • </ParallaxText>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-24 relative z-10 w-full">
+      <div className="w-[clamp(40rem,60vw,80rem)] max-w-[90vw] mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="bg-white rounded-3xl shadow-2xl border border-zinc-100 overflow-hidden"
+          className="bg-white rounded-[clamp(1.5rem,2vw,3rem)] shadow-2xl border border-zinc-100 overflow-hidden"
         >
           <div className="grid grid-cols-1 lg:grid-cols-5">
             {/* Left Panel: Info & Context */}
-            <div className="lg:col-span-2 bg-white text-black p-6 md:p-10 flex flex-col justify-between relative overflow-hidden border-b lg:border-r lg:border-b-0 border-zinc-100">
+            <div className="lg:col-span-2 bg-white text-black p-[clamp(1.5rem,3vw,4rem)] flex flex-col justify-between relative overflow-hidden border-b lg:border-r lg:border-b-0 border-zinc-100">
               <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-medium tracking-tight mb-6 text-zinc-900">
+                <h2 className="text-[clamp(1.5rem,2.5vw,3rem)] font-medium tracking-tight mb-[clamp(1rem,1.5vw,2rem)] text-zinc-900 leading-tight">
                   Iniziamo un progetto insieme.
                 </h2>
-                <p className="text-zinc-600 font-light leading-relaxed mb-8">
+                <p className="text-zinc-600 font-light leading-relaxed mb-8 text-[clamp(1rem,1.2vw,1.5rem)]">
                   Hai un'idea o un prodotto da scalare? Compila il form e costruiamo qualcosa di straordinario.
                 </p>
 
@@ -172,8 +174,8 @@ export function ContactForm() {
             </div>
 
             {/* Right Panel: Form */}
-            <div className="lg:col-span-3 p-6 md:p-10 bg-white">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div className="lg:col-span-3 p-[clamp(1.5rem,3vw,4rem)] bg-white">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-[clamp(1.5rem,3vw,4rem)]">
 
                 {/* Service Selection */}
                 <div className="space-y-4">

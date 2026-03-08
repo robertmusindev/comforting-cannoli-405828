@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useVelocity, useAnimationFrame } from "motion/react";
-import { useRef } from "react";
+import { useRef, useContext } from "react";
+import { ScrollContext } from "../App";
 
 // Utility for wrapping numbers
 const wrap = (min: number, max: number, v: number) => {
@@ -40,7 +41,7 @@ const AIProductAnimation = () => {
   for (let i = 6; i < 9; i++) for (let j = 9; j < 11; j++) connections.push([i, j]);
 
   return (
-    <div className="w-full h-48 bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
+    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
       {/* Browser UI */}
       <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -126,12 +127,12 @@ const AIProductAnimation = () => {
             </g>
           ))}
 
-          {/* Central "brain" icon — subtle AI badge */}
+          {/* Central "brain" icon */}
           <motion.g
             animate={{ opacity: [0.15, 0.35, 0.15] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
-            <text x="135" y="185" textAnchor="middle" fontSize="9" fill="rgba(0,0,0,0.3)" fontFamily="system-ui" fontWeight="300" letterSpacing="0.1em">
+            <text x="135" y="185" textAnchor="middle" fontSize="12" fill="rgba(0,0,0,0.3)" fontFamily="system-ui" fontWeight="300" letterSpacing="0.1em">
               AI MODEL
             </text>
           </motion.g>
@@ -145,11 +146,11 @@ const AIProductAnimation = () => {
    2. WEB APP / DASHBOARD ANIMATION (preserved)
    ═══════════════════════════════════════════════════ */
 const WebAppAnimation = () => (
-  <div className="w-full h-48 bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
+  <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
     {/* Browser UI */}
-    <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
-      <div className="w-2 h-2 rounded-full bg-zinc-300" />
-      <div className="w-2 h-2 rounded-full bg-zinc-300" />
+    <div className="h-[clamp(1.5rem,2vw,3rem)] bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
+      <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
+      <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
       <div className="w-16 h-3 bg-zinc-200 rounded-full ml-2 opacity-50" />
     </div>
 
@@ -157,7 +158,7 @@ const WebAppAnimation = () => (
     <div className="p-4 flex gap-4 h-full">
       {/* Sidebar */}
       <motion.div
-        className="w-12 h-32 bg-zinc-50 rounded-lg flex flex-col gap-2 p-2"
+        className="w-[clamp(2rem,3vw,4rem)] h-full bg-zinc-50 rounded-[clamp(0.2rem,0.5vw,0.5rem)] flex flex-col gap-2 p-2"
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -185,9 +186,9 @@ const WebAppAnimation = () => (
         </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-[clamp(0.5rem,1vw,1rem)] h-full">
           <motion.div
-            className="h-20 bg-zinc-900 rounded-lg p-2 relative overflow-hidden"
+            className="h-full bg-zinc-900 rounded-[clamp(0.2rem,0.5vw,0.5rem)] p-2 relative overflow-hidden flex-1"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -206,7 +207,7 @@ const WebAppAnimation = () => (
             </svg>
           </motion.div>
           <motion.div
-            className="h-20 bg-zinc-100 rounded-lg p-2 flex flex-col justify-between"
+            className="h-full bg-zinc-100 rounded-[clamp(0.2rem,0.5vw,0.5rem)] p-2 flex flex-col justify-between flex-1"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
@@ -248,11 +249,11 @@ const APIFlowAnimation = () => {
   const hub = { x: 127, y: 85 };
 
   return (
-    <div className="w-full h-48 bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
+    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
       {/* Browser UI */}
-      <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-zinc-300" />
-        <div className="w-2 h-2 rounded-full bg-zinc-300" />
+      <div className="h-[clamp(1.5rem,2vw,3rem)] bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
+        <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
+        <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
         <div className="w-16 h-3 bg-zinc-200 rounded-full ml-2 opacity-50" />
       </div>
 
@@ -425,7 +426,8 @@ const expertiseAreas = [
    ═══════════════════════════════════════════════════ */
 function ParallaxText({ children, baseVelocity = 100 }: { children: string; baseVelocity: number }) {
   const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
+  const mainScrollContainer = useContext(ScrollContext);
+  const { scrollY } = useScroll({ container: mainScrollContainer || undefined });
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
     damping: 50,
@@ -453,16 +455,11 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
   });
 
   return (
-    <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
-      <motion.div className="flex whitespace-nowrap gap-4 flex-nowrap" style={{ x }}>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
-        <span className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap">
+      <motion.div className="flex whitespace-nowrap gap-[clamp(1rem,2vw,3rem)] flex-nowrap" style={{ x }}>
+        {[...Array(8)].map((_, i) => (
+          <span key={i} className="block text-[clamp(3rem,6vw,10rem)] font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+        ))}
       </motion.div>
     </div>
   );
@@ -473,35 +470,35 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
    ═══════════════════════════════════════════════════ */
 export function Expertise() {
   return (
-    <section id="expertise" className="py-0 pb-10 relative overflow-hidden w-full">
+    <section id="expertise" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
       {/* Premium Divider / Parallax Text */}
-      <div className="relative py-4 mb-2 w-full pointer-events-none z-0">
+      <div className="relative py-[clamp(1rem,2vw,3rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0">
         <ParallaxText baseVelocity={-1}>EXPERTISE • </ParallaxText>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-12 lg:px-24 relative z-10 w-full">
+      <div className="w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-[clamp(0.5rem,1.5vw,3vw)] flex justify-center relative z-10">
         {/* Simulated Mac Window */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="bg-white rounded-2xl shadow-2xl border border-zinc-200 overflow-hidden"
+          className="w-full max-w-[min(98vw,160rem)] max-h-[85vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-2xl border border-zinc-200 overflow-hidden"
         >
           {/* Window Header */}
-          <div className="bg-white/60 backdrop-blur-xl border-b border-zinc-200/50 px-4 py-3 flex items-center gap-2 sticky top-0 z-10">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#FF5F57] border border-[#E0443E]" />
-              <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
-              <div className="w-3 h-3 rounded-full bg-[#28C840] border border-[#1AAB29]" />
+          <div className="bg-white/80 backdrop-blur-md border-b border-zinc-200/50 px-[clamp(1rem,2vw,2.5rem)] py-[clamp(0.5rem,1vw,1.25rem)] flex items-center gap-[clamp(0.5rem,0.8vw,1.5rem)] sticky top-0 z-10">
+            <div className="flex gap-[clamp(0.5rem,0.6vw,1.25rem)]">
+              <div className="w-[clamp(0.75rem,0.8vw,1.25rem)] h-[clamp(0.75rem,0.8vw,1.25rem)] rounded-full bg-[#FF5F57] border border-[#E0443E]" />
+              <div className="w-[clamp(0.75rem,0.8vw,1.25rem)] h-[clamp(0.75rem,0.8vw,1.25rem)] rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
+              <div className="w-[clamp(0.75rem,0.8vw,1.25rem)] h-[clamp(0.75rem,0.8vw,1.25rem)] rounded-full bg-[#28C840] border border-[#1AAB29]" />
             </div>
-            <div className="ml-4 text-xs font-medium text-zinc-400 font-mono flex-1 text-center pr-12">
+            <div className="ml-[clamp(1rem,2vw,3rem)] text-[clamp(0.8rem,1vw,1.2rem)] font-medium text-zinc-400 font-mono flex-1 text-center pr-[clamp(3rem,6vw,8rem)]">
               robert_musin_expertise.tsx
             </div>
           </div>
 
           {/* Window Content */}
-          <div className="p-5 md:p-12 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 bg-white">
+          <div className="p-[clamp(1rem,2.5vw,6rem)] grid grid-cols-1 md:grid-cols-3 gap-[clamp(1rem,2.5vw,5rem)] bg-white flex-1 overflow-y-auto w-full">
             {expertiseAreas.map((area, i) => (
               <motion.div
                 key={area.title}
@@ -509,18 +506,18 @@ export function Expertise() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group flex flex-col gap-6"
+                className="group flex flex-col gap-[clamp(1rem,1.5vw,2.5rem)] h-full w-full"
               >
                 {/* Animation Container */}
-                <div className="w-full aspect-[4/3] flex items-center justify-center">
+                <div className="w-full h-auto aspect-[4/3] flex items-center justify-center">
                   <area.animation />
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-2xl font-medium text-zinc-900 tracking-tight">
+                <div className="flex flex-col gap-[clamp(0.5rem,0.8vw,1.5rem)] mt-auto flex-1">
+                  <h3 className="text-[clamp(1.2rem,1.8vw,3rem)] font-medium text-zinc-900 tracking-tight leading-tight">
                     {area.title}
                   </h3>
-                  <p className="text-zinc-500 leading-relaxed font-light text-sm md:text-base">
+                  <p className="text-zinc-500 leading-snug font-light text-[clamp(0.85rem,1vw,1.8rem)]">
                     {area.description}
                   </p>
                 </div>

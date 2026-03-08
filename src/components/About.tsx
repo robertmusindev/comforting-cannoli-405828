@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
 import { motion, useScroll, useTransform, useInView } from "motion/react";
+import { ScrollContext } from "../App";
 
 /* ─── NEURAL BACKGROUND COMPONENT ─── */
 const NeuralBackground = () => {
@@ -62,36 +63,88 @@ const NeuralBackground = () => {
     );
 };
 
-/* ─── CUSTOM MINIMAL DIVIDER ─── */
-const MinimalDivider = () => {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
+/* ─── SCROLL DRIVEN EXPERTISE TEXT COMPONENT ─── */
+const ScrollExpertiseArea = () => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const mainScrollContainer = useContext(ScrollContext);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        container: mainScrollContainer || undefined,
+        offset: ["start start", "end end"]
+    });
 
     return (
-        <div ref={ref} className="relative w-full max-w-[120px] flex justify-center items-center py-8 z-20">
-            {/* The animated horizontal dash (Left) */}
-            <motion.div
-                className="h-[1px] bg-zinc-800 shadow-[0_0_10px_rgba(0,0,0,0.1)]"
-                initial={{ width: 0 }}
-                animate={isInView ? { width: "100%" } : { width: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-            />
+        <div ref={containerRef} className="relative w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[300vh] md:snap-start md:snap-always">
+            <div className="sticky top-0 w-full h-[100svh] flex flex-col items-center justify-center overflow-hidden">
+                {/* Background line fading in and out cleanly */}
+                <motion.div
+                    className="absolute top-0 bottom-0 left-[clamp(1.5rem,4vw,6rem)] w-[1px] bg-zinc-200 z-10 hidden md:block"
+                    style={{ opacity: useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]) }}
+                />
 
-            {/* The central pip directly on the spine */}
-            <motion.div
-                className="w-2 h-2 bg-black rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2)] flex-shrink-0 mx-[2px] relative z-20"
-                initial={{ scale: 0 }}
-                animate={isInView ? { scale: 1 } : { scale: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-            />
+                {/* The progressive black line filling up */}
+                <motion.div
+                    className="absolute top-0 left-[clamp(1.5rem,4vw,6rem)] w-[2px] -ml-[0.5px] bg-zinc-800 z-20 origin-top shadow-[0_0_10px_rgba(0,0,0,0.1)] hidden md:block"
+                    style={{
+                        height: useTransform(scrollYProgress, [0, 0.9], ["0%", "100%"]),
+                        opacity: useTransform(scrollYProgress, [0, 0.1, 0.8, 0.95], [0, 1, 1, 0])
+                    }}
+                />
 
-            {/* Symmetrical right horizontal dash */}
-            <motion.div
-                className="h-[1px] bg-zinc-800 shadow-[0_0_10px_rgba(0,0,0,0.1)]"
-                initial={{ width: 0 }}
-                animate={isInView ? { width: "100%" } : { width: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-            />
+                {/* The glowing dot tracking the tip of the line */}
+                <motion.div
+                    className="absolute top-0 left-[clamp(1.5rem,4vw,6rem)] w-3 h-3 -ml-[5px] rounded-full border border-black bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] z-30 hidden md:block origin-center"
+                    style={{
+                        y: useTransform(scrollYProgress, [0, 0.9], ["0vh", "100vh"]),
+                        opacity: useTransform(scrollYProgress, [0, 0.1, 0.8, 0.95], [0, 1, 1, 0]),
+                        scale: useTransform(scrollYProgress, [0, 0.05, 0.8, 0.95], [0, 1, 1, 0])
+                    }}
+                />
+
+                <div className="relative w-full h-full max-w-[clamp(40rem,60vw,80rem)] px-4 mx-auto flex items-center justify-center">
+                    {expertiseData.map((item, i) => {
+                        const isFirst = i === 0;
+                        const isLast = i === expertiseData.length - 1;
+
+                        const start = i * 0.2;
+                        const fadeIn = start + 0.05;
+                        const fadeOut = start + 0.15;
+                        const end = start + 0.2;
+
+                        const opacity = useTransform(
+                            scrollYProgress,
+                            [start, fadeIn, fadeOut, end],
+                            [isFirst ? 1 : 0, 1, 1, isLast ? 1 : 0]
+                        );
+
+                        const y = useTransform(
+                            scrollYProgress,
+                            [start, fadeIn, fadeOut, end],
+                            [isFirst ? 0 : 40, 0, 0, isLast ? 0 : -40]
+                        );
+
+                        const pointerEvents = useTransform(
+                            opacity,
+                            (val) => (val > 0.5 ? "auto" : "none")
+                        );
+
+                        return (
+                            <motion.div
+                                key={i}
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex flex-col items-center justify-center"
+                                style={{ opacity, y, pointerEvents }}
+                            >
+                                <h3 className="text-[clamp(1.8rem,3vw,5rem)] text-black font-medium tracking-tight mb-[clamp(1.5rem,2vw,3rem)] text-center w-full px-4 text-balance">
+                                    {item.title}
+                                </h3>
+                                <p className="text-zinc-500 text-[clamp(1.1rem,1.5vw,2.5rem)] leading-relaxed font-light text-center max-w-[clamp(40rem,50vw,70rem)] px-6 text-balance">
+                                    {item.description}
+                                </p>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            </div>
         </div>
     );
 };
@@ -120,49 +173,9 @@ const expertiseData = [
     }
 ];
 
-/* ─── SINGLE EXPERTISE NODE COMPONENT ─── */
-const ExpertiseNode = ({ key, item, index }: { key?: React.Key, item: typeof expertiseData[0], index: number }) => {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-    return (
-        <div ref={ref} className="relative w-full flex flex-col items-center justify-center py-24 z-10">
-
-            {/* Premium Minimal Divider */}
-            <MinimalDivider />
-
-            {/* Typography */}
-            <motion.h3
-                className="text-2xl md:text-3xl lg:text-4xl text-black font-medium tracking-tight mb-6 text-center max-w-2xl px-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-                {item.title}
-            </motion.h3>
-
-            <motion.p
-                className="text-zinc-500 text-base md:text-lg leading-relaxed font-light text-center max-w-xl px-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-            >
-                {item.description}
-            </motion.p>
-        </div>
-    );
-};
-
 /* ─── MAIN COMPONENT ─── */
 export function About() {
     const sectionRef = useRef<HTMLElement>(null);
-
-    // The glowing spine line animation
-    const { scrollYProgress } = useScroll({
-        target: sectionRef,
-        offset: ["start center", "end end"]
-    });
-    const spineHeight = useTransform(scrollYProgress, [0.1, 0.9], ["0%", "100%"]);
 
     return (
         <motion.section
@@ -172,14 +185,14 @@ export function About() {
             <div className="max-w-screen-xl mx-auto relative z-20">
 
                 {/* ── THE INTRO MANIFESTO CON NEURAL BACKGROUND ── */}
-                <div className="relative w-full min-h-screen flex flex-col items-center justify-center py-24 md:py-32">
+                <div className="md:snap-start md:snap-always relative w-full min-h-[100svh] flex flex-col items-center justify-center py-[clamp(4rem,8vw,12rem)]">
 
                     <NeuralBackground />
 
                     <div className="flex flex-col items-center justify-center px-4 relative z-10 text-center">
 
                         <motion.h2
-                            className="text-3xl md:text-5xl lg:text-6xl text-zinc-900 font-medium tracking-tight leading-[1.1] max-w-4xl mb-8"
+                            className="text-[clamp(2rem,4vw,6rem)] text-zinc-900 font-medium tracking-tight leading-[1.1] max-w-[clamp(40rem,60vw,80rem)] mb-[clamp(2rem,3vw,5rem)]"
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
@@ -189,7 +202,7 @@ export function About() {
                         </motion.h2>
 
                         <motion.p
-                            className="text-lg md:text-xl text-zinc-500 font-light leading-relaxed max-w-2xl px-6"
+                            className="text-[clamp(1.1rem,1.5vw,2.5rem)] text-zinc-500 font-light leading-relaxed max-w-[clamp(30rem,50vw,70rem)] px-6"
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
@@ -200,21 +213,8 @@ export function About() {
                     </div>
                 </div>
 
-                {/* ── THE SPINAL CORD AND NODES ── */}
-                <div className="relative pb-32">
-                    <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1px] bg-zinc-100 z-0" />
-                    <motion.div
-                        className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] bg-zinc-800 z-0 origin-top shadow-[0_0_10px_rgba(0,0,0,0.1)]"
-                        style={{ height: spineHeight }}
-                    />
-
-                    {/* ── THE 5 SYMMETRICAL NODES ── */}
-                    <div className="relative">
-                        {expertiseData.map((item, i) => (
-                            <ExpertiseNode key={i} item={item} index={i} />
-                        ))}
-                    </div>
-                </div>
+                {/* ── THE SPINAL CORD AND SCROLLING NODES ── */}
+                <ScrollExpertiseArea />
 
             </div>
         </motion.section>

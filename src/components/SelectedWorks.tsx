@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useVelocity, useAnimationFrame } from "motion/react";
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { ProjectDetail, Work } from "./ProjectDetail";
+import { ScrollContext } from "../App";
 
 // Utility for wrapping numbers
 const wrap = (min: number, max: number, v: number) => {
@@ -10,7 +11,8 @@ const wrap = (min: number, max: number, v: number) => {
 
 function ParallaxText({ children, baseVelocity = 100 }: { children: string; baseVelocity: number }) {
   const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
+  const mainScrollContainer = useContext(ScrollContext);
+  const { scrollY } = useScroll({ container: mainScrollContainer || undefined });
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
     damping: 50,
@@ -37,10 +39,10 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
   });
 
   return (
-    <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
-      <motion.div className="flex whitespace-nowrap gap-4 flex-nowrap" style={{ x }}>
+    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap">
+      <motion.div className="flex whitespace-nowrap gap-[clamp(1rem,2vw,3rem)] flex-nowrap" style={{ x, willChange: 'transform' }}>
         {[...Array(8)].map((_, i) => (
-          <span key={i} className="block text-2xl md:text-4xl font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
+          <span key={i} className="block text-[clamp(2.5rem,4vw,6rem)] font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
             {children}{" "}
           </span>
         ))}
@@ -107,7 +109,7 @@ export function SelectedWorks() {
   const activeWork = works.find(w => w.id === activeId) || works[0];
 
   return (
-    <section id="works" className="py-0 pb-10 relative overflow-hidden w-full">
+    <section id="works" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
       <AnimatePresence>
         {selectedProject && (
           <ProjectDetail work={selectedProject} onClose={() => setSelectedProject(null)} />
@@ -115,11 +117,11 @@ export function SelectedWorks() {
       </AnimatePresence>
 
       {/* Parallax Text Header */}
-      <div className="relative py-4 mb-2 w-full pointer-events-none z-0">
+      <div className="relative py-[clamp(0.5rem,1vw,1.5rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0">
         <ParallaxText baseVelocity={1}>PROGETTI • </ParallaxText>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10 w-full">
+      <div className="w-[90vw] mx-auto relative z-10 w-full">
         {/* Creative Container - White Theme, No Window Controls */}
         {/* ===== DESKTOP LAYOUT (Hidden on Mobile) ===== */}
         <motion.div
@@ -127,7 +129,7 @@ export function SelectedWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="hidden bg-white rounded-3xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.1)] border border-zinc-100 md:flex flex-row h-[550px]"
+          className="hidden bg-white rounded-[clamp(1.5rem,2vw,3rem)] overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.1)] border border-zinc-100 md:flex flex-row h-[clamp(30rem,40vw,50rem)]"
         >
           {/* Sidebar / List */}
           <div className="w-1/3 bg-white border-r border-zinc-100 flex flex-col relative z-10 flex-shrink-0">
@@ -203,7 +205,7 @@ export function SelectedWorks() {
                 initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ delay: 0.3, duration: 0.5 }}
-                className="bg-white/90 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 pointer-events-auto"
+                className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-white/20 pointer-events-auto"
               >
                 <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 justify-between items-end">
                   <div className="space-y-3">
@@ -265,7 +267,7 @@ export function SelectedWorks() {
 
               {/* Content Panel (Glassmorphism) at bottom */}
               <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
-                <div className="bg-white/10 backdrop-blur-xl p-5 rounded-2xl border border-white/20 pointer-events-auto group">
+                <div className="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20 pointer-events-auto group">
                   <div className="flex flex-col gap-4">
 
                     {/* Tags */}
