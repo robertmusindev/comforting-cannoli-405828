@@ -19,6 +19,7 @@ const Block = memo(({ index, colorIndex, targetColorIndex, isElimination, isGame
     // Reset blocks cleanly at the start of a round without unmounting them
     if (!isElimination && !isGameover && bodyRef.current) {
       bodyRef.current.setTranslation({ x: x * 2, y: -0.5, z: z * 2 }, true);
+      bodyRef.current.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
       bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
       bodyRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
     }

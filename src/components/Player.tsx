@@ -70,10 +70,13 @@ export function Player() {
 
     direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(SPEED * playerSpeedMultiplier);
 
-    // Ground check
-    const ray = new rapier.Ray(pos, { x: 0, y: -1, z: 0 });
-    const hit = world.castRay(ray, 1.5, true);
-    const isGrounded = hit && hit.toi < 1.1;
+    // Ground check (ignore player's own collider by offsetting origin)
+    const rayOrigin = { x: pos.x, y: pos.y - 0.9, z: pos.z };
+    const rayDir = { x: 0, y: -1, z: 0 };
+    const ray = new rapier.Ray(rayOrigin, rayDir);
+    // Raycast only 0.2 units down. Since origin is right above feet, 0.2 checks if floor is near
+    const hit = world.castRay(ray, 0.2, true);
+    const isGrounded = hit !== null;
 
     // Inertia & Aerial Control
     const currentVelocity = new THREE.Vector3(vel.x, 0, vel.z);
@@ -86,15 +89,8 @@ export function Player() {
     // Avatar rotation - tightly coupled to INPUT direction for responsiveness
     if (direction.lengthSq() > 0.1 && avatarRef.current) {
       const targetAngle = Math.atan2(direction.x, direction.z);
-      const currentRotation = new THREE.Euler().setFromQuaternion(avatarRef.current.quaternion);
-      
-      // Smooth but fast rotation
-      let diff = targetAngle - currentRotation.y;
-      // Normalize diff to -PI to PI
-      while (diff < -Math.PI) diff += Math.PI * 2;
-      while (diff > Math.PI) diff -= Math.PI * 2;
-      
-      avatarRef.current.rotation.y += diff * (1 - Math.exp(-15 * delta));
+      const targetQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetAngle);
+      avatarRef.current.quaternion.slerp(targetQuaternion, 1 - Math.exp(-15 * delta));
     }
 
     // Squash and stretch
@@ -132,7 +128,7 @@ export function Player() {
     }
 
     // Jump logic
-    if (keys.current.jump && isGrounded) {
+    if (keys.current.jump && isGrounded && vel.y <= 0.1) {
       bodyRef.current.setLinvel({ x: currentVelocity.x, y: JUMP_FORCE, z: currentVelocity.z }, true);
       audio.playJumpSound();
     } else if (!keys.current.jump && vel.y > 0 && !isGrounded) {
