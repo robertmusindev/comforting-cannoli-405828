@@ -1,4 +1,5 @@
 import { useFrame } from '@react-three/fiber';
+import { Billboard, Text } from '@react-three/drei';
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier';
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
@@ -11,15 +12,21 @@ const JUMP_FORCE = 8;
 export function Player() {
   const bodyRef = useRef<any>(null);
   const avatarRef = useRef<THREE.Group>(null);
+  const leftLegRef = useRef<THREE.Mesh>(null);
+  const rightLegRef = useRef<THREE.Mesh>(null);
+  const leftArmRef = useRef<THREE.Mesh>(null);
+  const rightArmRef = useRef<THREE.Mesh>(null);
   const footstepTimer = useRef(0);
+  const walkTime = useRef(0);
   
   // Use ref instead of useState to prevent continuous re-rendering
-  const keys = useRef({ forward: false, backward: false, left: false, right: false, jump: false });
+  const keys = useRef({ forward: false, backward: false, left: false, right: false, jump: false, jumpHandled: false });
   
   const { rapier, world } = useRapier();
   const playerDied = useGameStore(state => state.playerDied);
   const playerSpeedMultiplier = useGameStore(state => state.playerSpeedMultiplier);
   const gameState = useGameStore(state => state.gameState);
+  const username = useGameStore(state => state.username) || 'Guest';
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,7 +46,10 @@ export function Player() {
         case 'KeyS': case 'ArrowDown': keys.current.backward = false; break;
         case 'KeyA': case 'ArrowLeft': keys.current.left = false; break;
         case 'KeyD': case 'ArrowRight': keys.current.right = false; break;
-        case 'Space': keys.current.jump = false; break;
+        case 'Space': 
+          keys.current.jump = false; 
+          keys.current.jumpHandled = false; // Reset ability to jump when key is released
+          break;
       }
     };
     window.addEventListener('keydown', handleKeyDown, { passive: false });
@@ -70,13 +80,9 @@ export function Player() {
 
     direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(SPEED * playerSpeedMultiplier);
 
-    // Ground check (ignore player's own collider by offsetting origin)
-    const rayOrigin = { x: pos.x, y: pos.y - 0.9, z: pos.z };
-    const rayDir = { x: 0, y: -1, z: 0 };
-    const ray = new rapier.Ray(rayOrigin, rayDir);
-    // Raycast only 0.2 units down. Since origin is right above feet, 0.2 checks if floor is near
-    const hit = world.castRay(ray, 0.2, true);
-    const isGrounded = hit !== null;
+    // Ground check based purely on Y position and Y velocity to prevent any false physics positives
+    // Player spawns at y=5, and stands at ~y=5 on flat blocks.
+    const isGrounded = pos.y <= 5.2 && Math.abs(vel.y) < 0.2;
 
     // Inertia & Aerial Control
     const currentVelocity = new THREE.Vector3(vel.x, 0, vel.z);
@@ -106,6 +112,27 @@ export function Player() {
       }
     }
 
+    // Procedural Walking Animation
+    const speed = currentVelocity.length();
+    if (isGrounded && speed > 0.5) {
+      // 60fps smooth procedural walk cycle
+      walkTime.current += delta * speed * 1.5; // Walk frequency scales with speed
+      const armSwing = Math.sin(walkTime.current) * 0.5;
+      const legSwing = Math.sin(walkTime.current) * 0.6;
+      
+      if (leftArmRef.current) leftArmRef.current.rotation.x = armSwing;
+      if (rightArmRef.current) rightArmRef.current.rotation.x = -armSwing;
+      if (leftLegRef.current) leftLegRef.current.rotation.x = -legSwing;
+      if (rightLegRef.current) rightLegRef.current.rotation.x = legSwing;
+    } else {
+      // Smoothly return limbs to resting position (idle / jumping)
+      if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      walkTime.current = 0;
+    }
+
     // Hovered block
     const col = Math.floor((pos.x + 10) / 2);
     const row = Math.floor((pos.z + 10) / 2);
@@ -127,10 +154,11 @@ export function Player() {
       footstepTimer.current = 0;
     }
 
-    // Jump logic
-    if (keys.current.jump && isGrounded && vel.y <= 0.1) {
+    // Jump logic - Single jump enforcement
+    if (keys.current.jump && isGrounded && vel.y <= 0.1 && !keys.current.jumpHandled) {
       bodyRef.current.setLinvel({ x: currentVelocity.x, y: JUMP_FORCE, z: currentVelocity.z }, true);
       audio.playJumpSound();
+      keys.current.jumpHandled = true; // Mark jump as handled so holding space doesn't fly
     } else if (!keys.current.jump && vel.y > 0 && !isGrounded) {
       // Variable jump height: cut upward velocity if jump button is released
       bodyRef.current.setLinvel({ x: currentVelocity.x, y: vel.y * 0.8, z: currentVelocity.z }, true);
@@ -179,25 +207,39 @@ export function Player() {
           <boxGeometry args={[1, 1, 0.5]} />
           <meshStandardMaterial color="#3498db" flatShading />
         </mesh>
-        {/* Arms */}
-        <mesh position={[-0.7, 0.6, 0]} castShadow>
-          <boxGeometry args={[0.3, 1, 0.3]} />
-          <meshStandardMaterial color="#FFD1A4" flatShading />
-        </mesh>
-        <mesh position={[0.7, 0.6, 0]} castShadow>
-          <boxGeometry args={[0.3, 1, 0.3]} />
-          <meshStandardMaterial color="#FFD1A4" flatShading />
-        </mesh>
-        {/* Legs */}
-        <mesh position={[-0.25, -0.2, 0]} castShadow>
-          <boxGeometry args={[0.4, 0.6, 0.4]} />
-          <meshStandardMaterial color="#2c3e50" flatShading />
-        </mesh>
-        <mesh position={[0.25, -0.2, 0]} castShadow>
-          <boxGeometry args={[0.4, 0.6, 0.4]} />
-          <meshStandardMaterial color="#2c3e50" flatShading />
-        </mesh>
+        {/* Arms - Pivot from shoulder */}
+        <group position={[-0.7, 0.9, 0]}>
+          <mesh ref={leftArmRef} position={[0, -0.3, 0]} castShadow>
+            <boxGeometry args={[0.3, 1, 0.3]} />
+            <meshStandardMaterial color="#FFD1A4" flatShading />
+          </mesh>
+        </group>
+        <group position={[0.7, 0.9, 0]}>
+          <mesh ref={rightArmRef} position={[0, -0.3, 0]} castShadow>
+            <boxGeometry args={[0.3, 1, 0.3]} />
+            <meshStandardMaterial color="#FFD1A4" flatShading />
+          </mesh>
+        </group>
+        {/* Legs - Pivot from hip */}
+        <group position={[-0.25, 0.1, 0]}>
+          <mesh ref={leftLegRef} position={[0, -0.3, 0]} castShadow>
+            <boxGeometry args={[0.4, 0.6, 0.4]} />
+            <meshStandardMaterial color="#2c3e50" flatShading />
+          </mesh>
+        </group>
+        <group position={[0.25, 0.1, 0]}>
+          <mesh ref={rightLegRef} position={[0, -0.3, 0]} castShadow>
+            <boxGeometry args={[0.4, 0.6, 0.4]} />
+            <meshStandardMaterial color="#2c3e50" flatShading />
+          </mesh>
+        </group>
       </group>
+      {/* Name Tag */}
+      <Billboard position={[0, 2.8, 0]}>
+        <Text fontSize={0.4} color="white" outlineWidth={0.05} outlineColor="black" fontWeight="bold">
+          {username}
+        </Text>
+      </Billboard>
     </RigidBody>
   );
 }

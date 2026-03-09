@@ -2,15 +2,21 @@ import { create } from 'zustand';
 import { audio } from './utils/audio';
 
 export const COLORS = [
-  { name: 'ROSSO', hex: '#FF3333' },
-  { name: 'BLU', hex: '#3333FF' },
-  { name: 'VERDE', hex: '#33FF33' },
-  { name: 'GIALLO', hex: '#FFFF33' },
-  { name: 'VIOLA', hex: '#9933FF' },
-  { name: 'ARANCIONE', hex: '#FF9933' }
+  { name: 'ROSSO', hex: '#FF0000' },
+  { name: 'ARANCIONE SCURO', hex: '#FF4500' },
+  { name: 'AMBRA', hex: '#FFA500' },
+  { name: 'GIALLO', hex: '#FFFF00' },
+  { name: 'VERDE MELA', hex: '#80C000' },
+  { name: 'TEAL', hex: '#009688' },
+  { name: 'AZZURRO', hex: '#0070C0' },
+  { name: 'BLU NAVY', hex: '#002094' },
+  { name: 'INDACO', hex: '#4B0082' },
+  { name: 'MAGENTA', hex: '#C00070' }
 ];
 
-type GameState = 'menu' | 'waiting' | 'playing' | 'elimination' | 'gameover';
+export const BOT_NAMES = ['Astro', 'Turbo', 'Neon', 'Pixels', 'Blitz', 'Dash', 'Zenith', 'Nova', 'Echo', 'Vortex', 'Pulse'];
+
+type GameState = 'menu' | 'waiting' | 'playing' | 'elimination' | 'gameover' | 'victory';
 
 interface GameStore {
   gameId: number;
@@ -23,6 +29,7 @@ interface GameStore {
   gridColors: number[];
   playerSpeedMultiplier: number;
   hoveredBlockIndex: number;
+  aliveBots: number[];
   
   setUsername: (name: string) => void;
   setHoveredBlock: (index: number) => void;
@@ -31,6 +38,7 @@ interface GameStore {
   tick: (delta: number) => void;
   eliminate: () => void;
   playerDied: () => void;
+  eliminateBot: (id: number) => void;
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -44,6 +52,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   gridColors: Array.from({ length: 400 }, () => Math.floor(Math.random() * COLORS.length)),
   playerSpeedMultiplier: 1,
   hoveredBlockIndex: -1,
+  aliveBots: [],
 
   setUsername: (name: string) => set({ username: name }),
   setHoveredBlock: (index: number) => set({ hoveredBlockIndex: index }),
@@ -55,7 +64,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameId: state.gameId + 1,
       roundsSurvived: 0, 
       playerSpeedMultiplier: 1, 
-      gameState: 'waiting' 
+      gameState: 'waiting',
+      aliveBots: Array.from({ length: 11 }, (_, i) => i) // 11 bots + 1 player = 12 total
     }));
     get().startRound();
   },
@@ -125,6 +135,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ gameState: 'gameover' });
       audio.stopMusic();
       audio.playGameOverSound();
+    }
+  },
+
+  eliminateBot: (id: number) => {
+    const newAliveBots = get().aliveBots.filter(botId => botId !== id);
+    set({ aliveBots: newAliveBots });
+    
+    // Check win condition
+    if (newAliveBots.length === 0 && get().gameState !== 'gameover' && get().gameState !== 'victory') {
+      setTimeout(() => {
+        if (get().gameState !== 'gameover') {
+          set({ gameState: 'victory', timeLeft: 0 });
+          audio.stopMusic();
+          // audio.playVictorySound() - Reusing logic or adding if exists
+        }
+      }, 1000);
     }
   }
 }));

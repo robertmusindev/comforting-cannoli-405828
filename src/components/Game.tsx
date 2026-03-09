@@ -3,7 +3,8 @@ import { Physics } from '@react-three/rapier';
 import { Sky, Environment } from '@react-three/drei';
 import { Platform } from './Platform';
 import { Player } from './Player';
-import { useGameStore } from '../store';
+import { Bot } from './Bot';
+import { useGameStore, BOT_NAMES } from '../store';
 import * as THREE from 'three';
 
 function GameLogic() {
@@ -29,6 +30,7 @@ function MenuCamera() {
 export function Game() {
   const gameState = useGameStore(state => state.gameState);
   const gameId = useGameStore(state => state.gameId);
+  const aliveBots = useGameStore(state => state.aliveBots);
 
   return (
     <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 10, 15], fov: 50 }}>
@@ -50,7 +52,14 @@ export function Game() {
       
       <Physics gravity={[0, -20, 0]} timeStep="vary">
         <Platform />
-        {(gameState === 'playing' || gameState === 'elimination') && <Player key={gameId} />}
+        {(gameState === 'playing' || gameState === 'elimination') && (
+          <>
+            <Player key={`player-${gameId}`} />
+            {aliveBots.map(id => (
+              <Bot key={`bot-${gameId}-${id}`} id={id} name={BOT_NAMES[id]} />
+            ))}
+          </>
+        )}
       </Physics>
 
       {(gameState === 'menu' || gameState === 'gameover') && <MenuCamera />}
