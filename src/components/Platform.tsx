@@ -37,29 +37,26 @@ export function Platform() {
     return inst;
   }, []);
 
-  // Update logic: Handle colors and falling states
+  // 1. Physics Update: Only run when game state or round changes
   useEffect(() => {
-    if (!meshRef.current || !rigidBodiesRef.current) return;
+    if (!rigidBodiesRef.current) return;
 
-    const tempColor = new THREE.Color();
-    
     gridColors.forEach((colorIndex, i) => {
       const body = rigidBodiesRef.current![i];
       if (!body) return;
 
       const isTarget = colorIndex === targetColorIndex;
-      const shouldFall = (isElimination || isGameover) && !isTarget;
+      const shouldHide = (isElimination || isGameover) && !isTarget;
       
-      // Update Physics State
-      if (shouldFall) {
-        // Optimization: Instant disappearance instead of falling physics to maintain 60FPS
-        body.setBodyType(2, true); // Ensure it's Kinematic
+      if (shouldHide) {
+        // Move far but not TOO far (avoid precision/NaN issues), keep kinematic
+        body.setBodyType(2, true);
         const x = (i % GRID_SIZE) - 9.5;
         const z = Math.floor(i / GRID_SIZE) - 9.5;
         body.setTranslation({ x: x * 2, y: -100, z: z * 2 }, true);
       } else {
-        // Active or Reset: Position at floor level
-        body.setBodyType(2, true); // Kinematic
+        // Reset to kinematic and restore position
+        body.setBodyType(2, true);
         const x = (i % GRID_SIZE) - 9.5;
         const z = Math.floor(i / GRID_SIZE) - 9.5;
         body.wakeUp();
@@ -68,21 +65,34 @@ export function Platform() {
         body.setLinvel({ x: 0, y: 0, z: 0 }, true);
         body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       }
+    });
+  }, [roundsSurvived, isElimination, isGameover, targetColorIndex]); // REMOVED hoveredBlockIndex and gridColors from here
 
+  // 2. Visuals Update: Run on color changes or hover
+  useEffect(() => {
+    if (!meshRef.current) return;
+
+    const tempColor = new THREE.Color();
+    
+    gridColors.forEach((colorIndex, i) => {
       // Update Visuals (Colors)
       const colorHex = COLORS[colorIndex].hex;
       tempColor.set(colorHex);
       
-      // Hover effect
+      // Hover effect: Only touch color, don't touch physics!
       if (i === hoveredBlockIndex) {
-        tempColor.multiplyScalar(1.5);
+        tempColor.multiplyScalar(1.4); // Subtle highlight
       }
       
       meshRef.current?.setColorAt(i, tempColor);
     });
 
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [gridColors, isElimination, isGameover, targetColorIndex, hoveredBlockIndex, roundsSurvived]);
+    
+    // Senior Dev Tip: Manually compute bounding sphere to prevent the mesh 
+    // from disappearing if Three.js box culling gets confused by physics moves.
+    meshRef.current.computeBoundingSphere();
+  }, [gridColors, hoveredBlockIndex]);
 
   return (
     <group>
