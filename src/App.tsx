@@ -107,6 +107,8 @@ export default function App() {
   const roundsSurvived = useGameStore(state => state.roundsSurvived);
   // REMOVED timeLeft and maxTime from here to prevent re-renders every frame
   const gameState = useGameStore(state => state.gameState);
+  const startGame = useGameStore(state => state.startGame);
+  const username = useGameStore(state => state.username);
   const setUsername = useGameStore(state => state.setUsername);
   const aliveBots = useGameStore(state => state.aliveBots);
   const isPaused = useGameStore(state => state.isPaused);
