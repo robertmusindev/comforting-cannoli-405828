@@ -18,7 +18,7 @@ const TimerDisplay = memo(() => {
   const timeLeft = useGameStore(state => state.timeLeft);
   const maxTime = useGameStore(state => state.maxTime);
   const gameState = useGameStore(state => state.gameState);
-  
+
   const progress = Math.max(0, timeLeft / maxTime) * 100;
 
   // Determine color based on time left
@@ -32,7 +32,7 @@ const TimerDisplay = memo(() => {
   return (
     <div className="w-full max-w-lg mt-4 flex flex-col items-center">
       <div className="w-full h-8 bg-black/40 rounded-full overflow-hidden border-2 border-white/20 shadow-inner relative">
-        <motion.div 
+        <motion.div
           className={`h-full ${barColor} shadow-[0_0_15px_rgba(255,255,255,0.5)]`}
           initial={{ width: '100%' }}
           animate={{ width: `${progress}%` }}
@@ -49,7 +49,7 @@ const TimerDisplay = memo(() => {
 const FloatingBlocks = memo(() => {
   const blocks = Array.from({ length: 20 });
   const colors = ['bg-indigo-500', 'bg-pink-500', 'bg-emerald-500', 'bg-yellow-400', 'bg-red-500', 'bg-cyan-500'];
-  
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
       {blocks.map((_, i) => {
@@ -84,7 +84,7 @@ const FloatingBlocks = memo(() => {
 
 export default function App() {
   const { user, isLoading, initializeAuth, signOut } = useAuthStore();
-  
+
   const gameState = useGameStore(state => state.gameState);
   const targetColor = useGameStore(state => state.targetColor);
   const roundsSurvived = useGameStore(state => state.roundsSurvived);
@@ -103,15 +103,15 @@ export default function App() {
   const notifications = useProfileStore(state => state.notifications);
 
   const [inputName, setInputName] = useState(username);
-  
+
   // Multiplayer State
   const { lobbyId, isHost, players, isLoading: mpLoading, error: mpError, createLobby, joinLobby, leaveLobby } = useMultiplayerStore();
   const [joinCode, setJoinCode] = useState('');
   const [showJoinInput, setShowJoinInput] = useState(false);
-  
+
   // I18N
   const { t, language, setLanguage } = useI18nStore();
-  
+
   // Auth Form State
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState('');
@@ -126,8 +126,8 @@ export default function App() {
   const getUiScale = () => {
     if (typeof window === 'undefined') return 1;
     if (window.innerWidth > 1400 || window.innerHeight > 850) {
-      const scaleW = (window.innerWidth * 0.95) / 1400; 
-      const scaleH = (window.innerHeight * 0.90) / 850;  
+      const scaleW = (window.innerWidth * 0.95) / 1400;
+      const scaleH = (window.innerHeight * 0.90) / 850;
       return Math.max(1, Math.min(scaleW, scaleH));
     }
     return 1;
@@ -150,12 +150,12 @@ export default function App() {
       import('./store/profile').then(m => {
         // slight delay to let the profile load from supabase after auth resolves
         setTimeout(() => {
-           const profile = m.useProfileStore.getState().profile;
-           if (profile?.username) {
-             setInputName(profile.username);
-           } else {
-             setInputName(user.email!.split('@')[0] || t('player'));
-           }
+          const profile = m.useProfileStore.getState().profile;
+          if (profile?.username) {
+            setInputName(profile.username);
+          } else {
+            setInputName(user.email!.split('@')[0] || t('player'));
+          }
         }, 500);
       });
     }
@@ -168,7 +168,7 @@ export default function App() {
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-      const interval: any = setInterval(function() {
+      const interval: any = setInterval(function () {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) {
           return clearInterval(interval);
@@ -176,7 +176,7 @@ export default function App() {
         const particleCount = 50 * (timeLeft / duration);
         confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
       }, 250);
-      
+
       return () => clearInterval(interval);
     } else if (roundsSurvived > 0) {
       // Small confetti burst on surviving a round
@@ -205,7 +205,7 @@ export default function App() {
   const handleJoinMultiplayer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!joinCode.trim() || joinCode.length !== 5) return;
-    
+
     const finalName = inputName.trim() || (user ? (user.email?.split('@')[0] || t('player')) : t('guest'));
     setUsername(finalName);
     joinLobby(joinCode.trim(), finalName, user?.id);
@@ -269,7 +269,7 @@ export default function App() {
         {/* Top Bar */}
         <AnimatePresence>
           {gameState !== 'menu' && (
-            <motion.div 
+            <motion.div
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="flex justify-between items-start"
@@ -284,9 +284,9 @@ export default function App() {
                   {t('alive')}: {aliveBots.length + (gameState === 'gameover' ? 0 : 1)}/12
                 </div>
               </div>
-              
+
               {(gameState === 'playing' || gameState === 'elimination') && targetColor && (
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0.8, opacity: 0, y: -20 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   key={roundsSurvived} // Re-animate on new round
@@ -294,14 +294,14 @@ export default function App() {
                 >
                   <div className="bg-slate-900/40 backdrop-blur-sm p-4 rounded-[2.5rem] border-2 border-white/20 shadow-xl flex flex-col items-center gap-2">
                     {/* Compact Color Indicator Rectangle */}
-                    <motion.div 
+                    <motion.div
                       animate={{ scale: [1, 1.05, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                       className="w-24 h-12 md:w-32 md:h-16 rounded-2xl shadow-inner border-4 border-white/30"
                       style={{ backgroundColor: targetColor.hex }}
                     />
                     {/* Color Name below */}
-                    <div 
+                    <div
                       className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] drop-shadow-sm"
                       style={{ color: targetColor.hex }}
                     >
@@ -311,7 +311,7 @@ export default function App() {
                   <TimerDisplay />
                 </motion.div>
               )}
-              
+
               <div className="flex items-center gap-2">
                 {/* Live Coin HUD moved to Top Right */}
                 {(gameState === 'playing' || gameState === 'elimination') && (
@@ -325,7 +325,7 @@ export default function App() {
                   <span className="truncate">{username || (user?.email?.split('@')[0] || t('player'))}</span>
                 </div>
                 {user && (
-                  <button 
+                  <button
                     onClick={async () => {
                       await signOut();
                     }}
@@ -342,7 +342,7 @@ export default function App() {
 
         {/* Center Messages */}
         <div className="flex-1 flex items-center justify-center relative">
-          
+
           {/* Language Selector */}
           {gameState === 'menu' && !lobbyId && (
             <div className="absolute top-0 right-4 md:right-8 bg-white/80 backdrop-blur-md rounded-2xl flex p-1.5 gap-1.5 shadow-lg border-2 border-indigo-100 pointer-events-auto z-50">
@@ -350,11 +350,10 @@ export default function App() {
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
-                  className={`w-10 h-10 rounded-xl font-black text-sm uppercase transition-all flex items-center justify-center ${
-                    language === lang 
-                      ? 'bg-indigo-500 text-white shadow-md scale-105' 
+                  className={`w-10 h-10 rounded-xl font-black text-sm uppercase transition-all flex items-center justify-center ${language === lang
+                      ? 'bg-indigo-500 text-white shadow-md scale-105'
                       : 'bg-transparent text-slate-400 hover:bg-slate-100 hover:text-slate-600'
-                  }`}
+                    }`}
                 >
                   {lang === 'en' ? '🇬🇧' : lang === 'it' ? '🇮🇹' : '🇷🇺'}
                 </button>
@@ -369,11 +368,11 @@ export default function App() {
                 initial={{ scale: 0, opacity: 0, x: 20 }}
                 animate={{ scale: 1, opacity: 1, x: 0 }}
                 exit={{ scale: 0, opacity: 0, x: 20 }}
-                className="absolute top-36 right-2 md:top-48 md:right-4 z-[100] pointer-events-auto"
+                className="absolute top-36 right-2 md:top-48 md:right0 z-[100] pointer-events-auto"
               >
                 <div className="flex flex-col items-center gap-2">
                   <motion.button
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.15, 1],
                       rotate: [0, -2, 2, 0],
                       boxShadow: [
@@ -382,33 +381,33 @@ export default function App() {
                         "0 0 10px rgba(251,191,36,0.3)"
                       ]
                     }}
-                    transition={{ 
-                      duration: 2.5, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                     whileHover={{ scale: 1.2, rotate: 5 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setShowShop(true)}
-                    className="relative w-16 h-16 md:w-20 md:h-20 bg-amber-400 rounded-full border-4 border-slate-900 shadow-[2px_6px_0_#b45309] flex items-center justify-center group overflow-hidden"
+                    className="relative w-16 h-16 md:w-20 md:h-20 bg-amber-400 rounded-full border-[6px] border-slate-900 shadow-[2px_6px_0_#b45309] flex items-center justify-center group overflow-hidden"
                   >
                     {/* Interior Shine Animation */}
-                    <motion.div 
+                    <motion.div
                       animate={{ left: ['-100%', '200%'] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', repeatDelay: 0.5 }}
                       className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 z-0"
                     />
 
                     <Coins size={36} className="text-white drop-shadow-[0_2px_0_#d97706] relative z-10 filter" strokeWidth={2.5} />
-                    
+
                     {/* "SHOP" pulse tag */}
-                    <div className="absolute -bottom-1 bg-rose-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full border-2 border-slate-900 z-20 shadow-md">
+                    <div className="absolute -bottom-1 bg-rose-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border-2 border-slate-900 z-20 shadow-md">
                       SHOP
                     </div>
                   </motion.button>
-                  
+
                   {/* PB Amount Bubble under button */}
-                  <motion.div 
+                  <motion.div
                     initial={{ y: 5, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full border-2 border-slate-900 shadow-sm flex items-center gap-1.5"
@@ -425,7 +424,7 @@ export default function App() {
 
           <AnimatePresence mode="wait">
             {gameState === 'menu' && !lobbyId && (
-              <motion.div 
+              <motion.div
                 key="menu"
                 initial={{ scale: 0.5 * uiScale, opacity: 0, y: 50 }}
                 animate={{ scale: 1 * uiScale, opacity: 1, y: 0 }}
@@ -449,7 +448,7 @@ export default function App() {
                       {t('app_subtitle')}
                     </h1>
                   </motion.div>
-                  
+
                   {!user && (
                     <p className="font-black text-slate-700 mb-8 text-base sm:text-xl md:text-2xl max-w-[280px] sm:max-w-md uppercase bg-yellow-100 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-4 border-yellow-400 transform -rotate-3 shadow-[4px_4px_0_#ca8a04] break-words text-center md:text-left leading-tight mt-[-1rem]">
                       {t('tagline')}
@@ -469,7 +468,7 @@ export default function App() {
                             <span className="font-black text-lg text-indigo-900 leading-none truncate">{user.email?.split('@')[0]}</span>
                           </div>
                         </div>
-                        <button 
+                        <button
                           onClick={async () => {
                             await signOut();
                           }}
@@ -483,9 +482,9 @@ export default function App() {
                       <div className="relative group mt-2">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-2xl blur opacity-0 group-focus-within:opacity-30 transition duration-500" style={{ willChange: 'opacity' }}></div>
                         <User className="absolute left-5 top-1/2 transform -translate-y-1/2 text-indigo-400 group-focus-within:text-indigo-600 transition-colors z-10" size={20} />
-                        <input 
-                          type="text" 
-                          placeholder={t('choose_nickname')} 
+                        <input
+                          type="text"
+                          placeholder={t('choose_nickname')}
                           value={inputName}
                           onChange={(e) => setInputName(e.target.value)}
                           className="w-full relative pl-14 pr-4 py-4 rounded-3xl border-4 border-slate-900 focus:border-indigo-500 outline-none transition-all text-xl font-black bg-white text-slate-900 placeholder:text-slate-400 shadow-[4px_4px_0_#1e293b] focus:translate-y-1 focus:shadow-[0px_0px_0_#1e293b]"
@@ -494,7 +493,7 @@ export default function App() {
                       </div>
 
                       <div className="flex flex-col gap-3">
-                        <motion.button 
+                        <motion.button
                           whileHover={{ scale: 1.02, y: -2 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={handleStartGameWithUser}
@@ -503,9 +502,9 @@ export default function App() {
                         >
                           <Play fill="currentColor" size={24} /> <span className="tracking-wide">{t('singleplayer_bots') || 'SINGLEPLAYER (VS BOTS)'}</span>
                         </motion.button>
-                        
+
                         <div className="flex flex-col sm:flex-row w-full gap-3">
-                          <motion.button 
+                          <motion.button
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleCreateMultiplayer}
@@ -529,7 +528,7 @@ export default function App() {
                               />
                             </form>
                           ) : (
-                            <motion.button 
+                            <motion.button
                               whileHover={{ scale: 1.02, y: -2 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => setShowJoinInput(true)}
@@ -548,9 +547,9 @@ export default function App() {
                       <div className="relative group">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-400 to-fuchsia-500 rounded-2xl blur opacity-0 group-focus-within:opacity-30 transition duration-500" style={{ willChange: 'opacity' }}></div>
                         <User className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-violet-600 transition-colors z-10" size={20} />
-                        <input 
-                          type="text" 
-                          placeholder={t('choose_nickname')} 
+                        <input
+                          type="text"
+                          placeholder={t('choose_nickname')}
                           value={inputName}
                           onChange={(e) => setInputName(e.target.value)}
                           className="w-full relative pl-14 pr-4 py-5 rounded-3xl border-4 border-slate-900 focus:border-violet-500 outline-none transition-all text-xl font-black bg-white text-slate-900 placeholder:text-slate-400 shadow-[4px_4px_0_#1e293b] focus:translate-y-1 focus:shadow-[0px_0px_0_#1e293b]"
@@ -559,19 +558,19 @@ export default function App() {
                       </div>
 
                       <div className="flex flex-col gap-3">
-                        <motion.button 
+                        <motion.button
                           whileHover={{ scale: 1.02, y: -2 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={handleStartGameWithUser}
                           transition={{ type: "spring", stiffness: 400, damping: 10 }}
                           className="w-full bg-violet-600 hover:bg-violet-500 text-white font-black py-4 px-4 sm:px-6 rounded-3xl text-sm sm:text-lg transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 sm:gap-3 border-4 border-slate-900 border-b-[8px] active:border-b-4 active:translate-y-1 whitespace-nowrap overflow-hidden text-ellipsis text-center"
                         >
-                          <Play fill="currentColor" className="shrink-0 w-6 h-6" /> 
+                          <Play fill="currentColor" className="shrink-0 w-6 h-6" />
                           <span className="tracking-wide truncate">{t('play_as_guest')}</span>
                         </motion.button>
 
                         <div className="flex flex-col sm:flex-row w-full gap-3">
-                          <motion.button 
+                          <motion.button
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleCreateMultiplayer}
@@ -595,7 +594,7 @@ export default function App() {
                               />
                             </form>
                           ) : (
-                            <motion.button 
+                            <motion.button
                               whileHover={{ scale: 1.02, y: -2 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => setShowJoinInput(true)}
@@ -623,14 +622,14 @@ export default function App() {
 
                     <div className="flex-1 flex flex-col justify-center shrink-0 w-full md:max-w-sm min-w-0">
                       <form onSubmit={handleAuthSubmit} className="bg-white p-6 sm:p-8 rounded-[3rem] border-[6px] border-slate-900 shadow-[8px_12px_0_#1e1b4b] relative overflow-hidden group w-full">
-                        
+
 
                         {authLoading && (
                           <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex items-center justify-center rounded-[2rem]">
                             <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
                           </div>
                         )}
-                        
+
                         <div className="relative z-10">
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <h3 className="font-black text-slate-800 text-lg sm:text-xl tracking-tight flex-1 whitespace-nowrap overflow-hidden text-ellipsis">
@@ -650,7 +649,7 @@ export default function App() {
 
                           <AnimatePresence>
                             {authError && (
-                              <motion.div 
+                              <motion.div
                                 initial={{ opacity: 0, height: 0, y: -10 }}
                                 animate={{ opacity: 1, height: 'auto', y: 0 }}
                                 exit={{ opacity: 0, height: 0, y: -10 }}
@@ -687,7 +686,7 @@ export default function App() {
                               />
                             </div>
                           </div>
-                          
+
                           <motion.button
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
@@ -713,7 +712,7 @@ export default function App() {
             )}
 
             {gameState === 'menu' && lobbyId && (
-              <motion.div 
+              <motion.div
                 key="lobby"
                 initial={{ scale: 0.8 * uiScale, opacity: 0, boxShadow: "0px 0px 0px rgba(0,0,0,0)" }}
                 animate={{ scale: 1 * uiScale, opacity: 1, boxShadow: "0px 25px 50px -12px rgba(0,0,0,0.25)" }}
@@ -721,7 +720,7 @@ export default function App() {
                 className="bg-white p-8 sm:p-10 rounded-[3rem] w-full max-w-2xl border-[8px] border-slate-900 shadow-[12px_16px_0_#1e1b4b] flex flex-col items-center pointer-events-auto relative z-10"
               >
                 <div className="flex justify-between w-full items-center mb-6 border-b-4 border-slate-200 pb-4">
-                  <button 
+                  <button
                     onClick={leaveLobby}
                     className="flex items-center gap-1 sm:gap-2 text-slate-500 hover:text-red-500 font-black transition-all border-b-4 border-transparent hover:border-red-200 active:border-b-0 active:translate-y-1 px-2 sm:px-3 py-2 rounded-xl text-sm sm:text-base break-words leading-tight shrink-0"
                   >
@@ -729,7 +728,7 @@ export default function App() {
                   </button>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-400 font-bold uppercase tracking-widest text-sm">{t('room_code')}</span>
-                    <motion.div 
+                    <motion.div
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95, y: 0 }}
                       className="bg-emerald-100 text-emerald-800 font-black text-2xl tracking-[0.2em] px-5 py-3 rounded-2xl flex items-center gap-3 cursor-pointer transition-colors border-4 border-slate-900 border-b-[8px] active:border-b-4 shadow-[0_0_15px_rgba(52,211,153,0.3)]"
@@ -765,9 +764,9 @@ export default function App() {
                   <motion.button
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                         useGameStore.getState().startGame();
-                      }}
+                    onClick={() => {
+                      useGameStore.getState().startGame();
+                    }}
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 sm:py-5 px-4 rounded-2xl text-sm sm:text-lg transition-colors shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 sm:gap-3 border-b-6 border-emerald-700 active:border-b-0 active:translate-y-1 text-center whitespace-nowrap overflow-hidden text-ellipsis"
                   >
@@ -782,7 +781,7 @@ export default function App() {
             )}
 
             {gameState === 'gameover' && (
-              <motion.div 
+              <motion.div
                 key="gameover"
                 initial={{ scale: 0.5 * uiScale, opacity: 0, rotate: -10 }}
                 animate={{ scale: 1 * uiScale, opacity: 1, rotate: 0 }}
@@ -798,15 +797,15 @@ export default function App() {
                   </p>
                   <p className="text-gray-500 text-md font-medium mt-1">{t('rounds_survived')}</p>
                 </div>
-                 <div className="text-center mt-3 bg-amber-100 border border-amber-300 rounded-xl p-2 max-w-xs mx-auto">
-                   <p className="text-amber-800 font-bold text-sm flex items-center justify-center gap-1">
-                      <Coins size={14} className="text-amber-500"/>
-                      {t('earned')} <span className="font-black">{(roundsSurvived * 10) + 5 + sessionCoins} PB</span>
-                   </p>
+                <div className="text-center mt-3 bg-amber-100 border border-amber-300 rounded-xl p-2 max-w-xs mx-auto">
+                  <p className="text-amber-800 font-bold text-sm flex items-center justify-center gap-1">
+                    <Coins size={14} className="text-amber-500" />
+                    {t('earned')} <span className="font-black">{(roundsSurvived * 10) + 5 + sessionCoins} PB</span>
+                  </p>
                 </div>
-                
+
                 <div className="flex flex-col gap-3 max-w-sm mx-auto w-full mt-8">
-                  <motion.button 
+                  <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     animate={{
@@ -834,29 +833,29 @@ export default function App() {
                     className="relative w-full overflow-hidden text-white font-black py-4 sm:py-5 px-6 rounded-3xl text-lg sm:text-xl transition-all shadow-lg flex items-center justify-center gap-2 border-4 border-slate-900 border-b-[8px] active:border-b-4 active:translate-y-1 group"
                   >
                     {/* Animated colorful gradient background */}
-                    <motion.div 
+                    <motion.div
                       animate={{
                         backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
                       }}
                       transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                       className="absolute inset-0 z-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-[length:200%_200%]"
                     />
-                    
+
                     {/* Hero Shine / Shimmer effect */}
-                    <motion.div 
+                    <motion.div
                       animate={{ left: ['-100%', '200%'] }}
                       transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
                       className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 z-0"
                     />
 
                     <div className="relative z-10 flex items-center justify-center gap-2 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] w-full">
-                      <Play fill="currentColor" size={24} className="text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]" /> 
+                      <Play fill="currentColor" size={24} className="text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]" />
                       <span className="tracking-wide uppercase text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] whitespace-nowrap overflow-hidden text-ellipsis w-full max-w-[90%]">
                         {t('double_pb')}
                       </span>
                     </div>
                   </motion.button>
-                  <motion.button 
+                  <motion.button
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={startGame}
@@ -870,7 +869,7 @@ export default function App() {
 
             {/* PAUSE MENU OVERLAY */}
             {isPaused && (gameState === 'playing' || gameState === 'waiting' || gameState === 'elimination') && (
-              <motion.div 
+              <motion.div
                 key="pause"
                 initial={{ opacity: 0, scale: 0.9 * uiScale, y: 10 }}
                 animate={{ opacity: 1, scale: 1 * uiScale, y: 0 }}
@@ -883,7 +882,7 @@ export default function App() {
                 </h2>
 
                 <div className="w-full space-y-4">
-                  <motion.button 
+                  <motion.button
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={togglePause}
@@ -892,15 +891,15 @@ export default function App() {
                   >
                     {t('resume')}
                   </motion.button>
-                  
-                  <motion.button 
+
+                  <motion.button
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       togglePause(); // Unpause
                       leaveLobby(); // Disconnect multiplayer
                       // Soft reload to menu
-                      window.location.reload(); 
+                      window.location.reload();
                     }}
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     className="w-full bg-slate-800 hover:bg-red-500 hover:text-white text-slate-300 font-bold py-4 rounded-2xl text-sm sm:text-base transition-colors border-2 border-slate-700 border-b-4 border-b-slate-900 hover:border-red-600 hover:border-b-red-800 active:border-b-2 active:translate-y-0.5 group flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis px-4"
@@ -913,7 +912,7 @@ export default function App() {
             )}
 
             {gameState === 'victory' && (
-              <motion.div 
+              <motion.div
                 key="victory"
                 initial={{ scale: 0.5 * uiScale, opacity: 0, y: -50 }}
                 animate={{ scale: 1 * uiScale, opacity: 1, y: 0 }}
@@ -933,7 +932,7 @@ export default function App() {
                     {roundsSurvived}
                   </p>
                 </div>
-                <motion.button 
+                <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={startGame}
@@ -977,7 +976,7 @@ export default function App() {
                 <div className="flex-1">
                   <p className="font-black text-sm leading-tight uppercase">{notif.message}</p>
                 </div>
-                <button 
+                <button
                   onClick={() => useProfileStore.getState().dismissNotification(notif.id)}
                   className="hover:scale-110 active:scale-95 transition-transform"
                 >

@@ -128,9 +128,9 @@ export const UserProfile = ({ user }: UserProfileProps) => {
               />
               
               {/* Avatar Container */}
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-4 border-slate-900 bg-indigo-100 shadow-[2px_4px_0_#1e1b4b] overflow-hidden flex items-center justify-center relative z-10 bg-white">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-[6px] border-slate-900 bg-indigo-100 shadow-[2px_6px_0_#1e1b4b] overflow-hidden flex items-center justify-center relative z-10 bg-white">
                 {isLoading ? (
-                  <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+                  <Loader2 className="w-10 h-10 text-indigo-400 animate-spin" />
                 ) : profile?.avatar_url && !imgError ? (
                   <img 
                     src={profile.avatar_url} 
@@ -140,23 +140,19 @@ export const UserProfile = ({ user }: UserProfileProps) => {
                     loading="lazy"
                   />
                 ) : (
-                  <User size={32} className="text-indigo-400" />
+                  <User size={40} className="text-indigo-400" />
                 )}
                 
                 {/* Hover overlay hint */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <TrendingUp size={20} className="text-white" />
+                   <TrendingUp size={24} className="text-white" />
                 </div>
               </div>
 
-              {/* Level Badge Overlay */}
-              {profile && (
-                <div className="absolute -bottom-1 -right-1 bg-yellow-400 border-2 border-slate-900 rounded-full w-7 h-7 flex items-center justify-center shadow-sm">
-                  <span className="font-black text-slate-900 text-[10px] leading-none text-center">
-                    Lvl<br/>{profile?.level || 1}
-                  </span>
-                </div>
-              )}
+              {/* "PROFILE" pulse tag */}
+              <div className="absolute -bottom-1 bg-indigo-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border-2 border-slate-900 z-20 shadow-md">
+                PROFILE
+              </div>
             </motion.button>
           </motion.div>
         )}
