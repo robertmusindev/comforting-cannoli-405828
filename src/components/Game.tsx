@@ -49,13 +49,13 @@ export function Game() {
       <ambientLight intensity={0.4} />
       <directionalLight 
         castShadow 
-        position={[50, 50, 20]} 
+        position={[30, 50, 20]} 
         intensity={1.5} 
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-25}
-        shadow-camera-right={25}
-        shadow-camera-top={25}
-        shadow-camera-bottom={-25}
+        shadow-mapSize={[512, 512]}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
         shadow-bias={-0.0001}
       />
       

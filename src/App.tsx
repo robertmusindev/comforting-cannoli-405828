@@ -3,7 +3,8 @@ import { useGameStore } from './store';
 import { useAuthStore } from './store/auth';
 import { useMultiplayerStore } from './store/multiplayer';
 import { useI18nStore } from './store/i18n';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Trophy, Play, User, LogOut, Loader2, LogIn, UserPlus, Ghost, AlertCircle, Users, Copy, ArrowLeft, Coins, Star, Bell, X, RotateCcw, Target } from 'lucide-react';
@@ -14,32 +15,49 @@ import { Shop } from './components/Shop';
 import { audio } from './utils/audio';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
-const TimerDisplay = memo(() => {
-  const timeLeft = useGameStore(state => state.timeLeft);
+const TimerBar = memo(() => {
+  const barRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const maxTime = useGameStore(state => state.maxTime);
   const gameState = useGameStore(state => state.gameState);
 
-  const progress = Math.max(0, timeLeft / maxTime) * 100;
+  useFrame(() => {
+    if (gameState !== 'playing' && gameState !== 'elimination') return;
+    
+    const store = useGameStore.getState();
+    const timeLeft = store.timeLeft;
+    const progress = Math.max(0, timeLeft / maxTime) * 100;
 
-  // Determine color based on time left
-  let barColor = 'bg-green-500';
-  if (timeLeft < 1.5) {
-    barColor = 'bg-red-500';
-  } else if (timeLeft < 3) {
-    barColor = 'bg-yellow-500';
-  }
+    if (barRef.current) {
+      barRef.current.style.width = `${progress}%`;
+      // Update color manually to avoid state transition overhead
+      if (timeLeft < 1.5) {
+        barRef.current.style.backgroundColor = '#ef4444'; // red-500
+      } else if (timeLeft < 3) {
+        barRef.current.style.backgroundColor = '#eab308'; // yellow-500
+      } else {
+        barRef.current.style.backgroundColor = '#22c55e'; // green-500
+      }
+    }
+    
+    if (textRef.current) {
+      textRef.current.innerText = gameState === 'playing' ? `${timeLeft.toFixed(1)}s` : '0.0s';
+    }
+  });
 
   return (
     <div className="w-full max-w-lg mt-4 flex flex-col items-center">
       <div className="w-full h-8 bg-black/40 rounded-full overflow-hidden border-2 border-white/20 shadow-inner relative">
-        <motion.div
-          className={`h-full ${barColor} shadow-[0_0_15px_rgba(255,255,255,0.5)]`}
-          initial={{ width: '100%' }}
-          animate={{ width: `${progress}%` }}
-          transition={{ ease: "linear", duration: 0.1 }}
+        <div
+          ref={barRef}
+          className="h-full transition-colors duration-200 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+          style={{ width: '100%', backgroundColor: '#22c55e' }}
         />
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center font-mono font-black text-xl text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-          {gameState === 'playing' ? `${timeLeft.toFixed(1)}s` : '0.0s'}
+        <div 
+          ref={textRef}
+          className="absolute top-0 left-0 w-full h-full flex items-center justify-center font-mono font-black text-xl text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]"
+        >
+          {maxTime.toFixed(1)}s
         </div>
       </div>
     </div>
@@ -85,11 +103,10 @@ const FloatingBlocks = memo(() => {
 export default function App() {
   const { user, isLoading, initializeAuth, signOut } = useAuthStore();
 
-  const gameState = useGameStore(state => state.gameState);
   const targetColor = useGameStore(state => state.targetColor);
   const roundsSurvived = useGameStore(state => state.roundsSurvived);
-  const startGame = useGameStore(state => state.startGame);
-  const username = useGameStore(state => state.username);
+  // REMOVED timeLeft and maxTime from here to prevent re-renders every frame
+  const gameState = useGameStore(state => state.gameState);
   const setUsername = useGameStore(state => state.setUsername);
   const aliveBots = useGameStore(state => state.aliveBots);
   const isPaused = useGameStore(state => state.isPaused);
@@ -308,7 +325,7 @@ export default function App() {
                       {t(targetColor.name.toLowerCase())}
                     </div>
                   </div>
-                  <TimerDisplay />
+                  <TimerBar />
                 </motion.div>
               )}
 

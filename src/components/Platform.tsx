@@ -105,7 +105,7 @@ export function Platform() {
           ref={meshRef}
           args={[undefined, undefined, TOTAL_BLOCKS]}
           castShadow
-          receiveShadow
+          receiveShadow={false}
           frustumCulled={false}
         >
           <boxGeometry args={[1.95, 1, 1.95]} />

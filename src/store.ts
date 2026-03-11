@@ -186,12 +186,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   tick: (delta: number) => {
     const { gameState, timeLeft } = get();
-    // The game must keep ticking even if the local player presses ESC
     if (gameState === 'playing') {
       const newTime = timeLeft - delta;
       if (newTime <= 0) {
         get().eliminate();
       } else {
+        // We still need to update state for other things that might depend on it, 
+        // but App.tsx will now use optimized TimerBar that doesn't trigger on every state change.
         set({ timeLeft: newTime });
       }
     }
