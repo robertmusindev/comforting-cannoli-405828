@@ -96,6 +96,7 @@ export function Platform() {
           args={[undefined, undefined, TOTAL_BLOCKS]}
           castShadow
           receiveShadow
+          frustumCulled={false}
         >
           <boxGeometry args={[1.95, 1, 1.95]} />
           <meshStandardMaterial roughness={0.8} />
