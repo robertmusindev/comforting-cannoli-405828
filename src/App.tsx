@@ -10,6 +10,7 @@ import { Trophy, Play, User, LogOut, Loader2, LogIn, UserPlus, Ghost, AlertCircl
 import { useProfileStore } from './store/profile';
 import { supabase } from './lib/supabase';
 import { UserProfile } from './components/UserProfile';
+import { Shop } from './components/Shop';
 import { audio } from './utils/audio';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -94,9 +95,11 @@ export default function App() {
   const isPaused = useGameStore(state => state.isPaused);
   const togglePause = useGameStore(state => state.togglePause);
   const [showProfile, setShowProfile] = useState(false);
+  const [showShop, setShowShop] = useState(false);
 
   // Economy & Notifications State (Must be called before ANY early return!)
   const sessionCoins = useGameStore(state => state.sessionCoins);
+  const profile = useProfileStore(state => state.profile);
   const notifications = useProfileStore(state => state.notifications);
 
   const [inputName, setInputName] = useState(username);
@@ -258,6 +261,7 @@ export default function App() {
       </ErrorBoundary>
       {gameState === 'menu' && <FloatingBlocks />}
       {user && <UserProfile user={user} />}
+      {user && <Shop isOpen={showShop} onClose={() => setShowShop(false)} />}
 
       {/* UI Overlay */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col justify-between p-6 z-40">
@@ -357,6 +361,67 @@ export default function App() {
               ))}
             </div>
           )}
+
+          {/* Dedicated Shop Button (PB) - Menu Only */}
+          <AnimatePresence>
+            {gameState === 'menu' && !lobbyId && user && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0, x: 20 }}
+                animate={{ scale: 1, opacity: 1, x: 0 }}
+                exit={{ scale: 0, opacity: 0, x: 20 }}
+                className="absolute top-36 right-4 md:top-48 md:right-8 z-[100] pointer-events-auto"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <motion.button
+                    animate={{ 
+                      scale: [1, 1.15, 1],
+                      rotate: [0, -2, 2, 0],
+                      boxShadow: [
+                        "0 0 10px rgba(251,191,36,0.3)",
+                        "0 0 30px rgba(251,191,36,0.8)",
+                        "0 0 10px rgba(251,191,36,0.3)"
+                      ]
+                    }}
+                    transition={{ 
+                      duration: 2.5, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                    whileHover={{ scale: 1.2, rotate: 5 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowShop(true)}
+                    className="relative w-16 h-16 md:w-20 md:h-20 bg-amber-400 rounded-full border-4 border-slate-900 shadow-[2px_6px_0_#b45309] flex items-center justify-center group overflow-hidden"
+                  >
+                    {/* Interior Shine Animation */}
+                    <motion.div 
+                      animate={{ left: ['-100%', '200%'] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', repeatDelay: 0.5 }}
+                      className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 z-0"
+                    />
+
+                    <Coins size={36} className="text-white drop-shadow-[0_2px_0_#d97706] relative z-10 filter" strokeWidth={2.5} />
+                    
+                    {/* "SHOP" pulse tag */}
+                    <div className="absolute -bottom-1 bg-rose-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full border-2 border-slate-900 z-20 shadow-md">
+                      SHOP
+                    </div>
+                  </motion.button>
+                  
+                  {/* PB Amount Bubble under button */}
+                  <motion.div 
+                    initial={{ y: 5, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full border-2 border-slate-900 shadow-sm flex items-center gap-1.5"
+                  >
+                    <Coins size={12} className="text-amber-500" />
+                    <span className="font-black text-[10px] text-slate-800 tabular-nums">
+                      {profile?.coins.toLocaleString() || 0}
+                    </span>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <AnimatePresence mode="wait">
             {gameState === 'menu' && !lobbyId && (
