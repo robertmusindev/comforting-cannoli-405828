@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { HighlightText } from "./About";
 
 const charVariants = {
   hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
@@ -11,6 +12,7 @@ const charVariants = {
       duration: 1.2,
       ease: [0.2, 0.65, 0.3, 0.9],
     },
+    willChange: "transform, opacity, filter"
   }),
 };
 
@@ -181,17 +183,18 @@ export function Hero() {
           initial={{ opacity: 0, y: 20, filter: "blur(5px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ delay: 2.0, duration: 1, ease: "easeOut" }}
-          className="mt-[clamp(1.5rem,3vw,4rem)] text-[clamp(1.125rem,2.2vw,2.5rem)] text-zinc-500 max-w-[clamp(40rem,60vw,80rem)] font-light tracking-wide leading-relaxed"
+          style={{ willChange: "transform, opacity, filter" }}
+          className="mt-[clamp(1.5rem,3vw,4rem)] text-[clamp(1.125rem,2.2vw,2.5rem)] text-zinc-500 max-w-[clamp(40rem,60vw,80rem)] font-light tracking-wide leading-relaxed transform-gpu"
         >
-          Creative Technologist & AI Prototyper. <br className="hidden md:block" />
-          Sviluppo prodotti digitali che scalano.
+          <HighlightText text="**Creative Technologist** & **AI Prototyper**." delayOffset={2.2} /> <br className="hidden md:block" />
+          <HighlightText text="Sviluppo prodotti digitali che **scalano**." delayOffset={2.7} />
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.8, duration: 0.8, ease: "easeOut" }}
-          className="mt-[clamp(2.5rem,5vw,7rem)] flex flex-col sm:flex-row items-center gap-[clamp(1.5rem,2vw,3rem)]"
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 2.8, duration: 0.8, ease: "easeOut" }}
+           className="mt-[clamp(2.5rem,5vw,7rem)] mb-[clamp(4rem,10vh,8rem)] flex flex-col sm:flex-row items-center gap-[clamp(1.5rem,2vw,3rem)]"
         >
           <a
             href="#contact"

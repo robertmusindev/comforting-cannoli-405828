@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useVelocity, useAnimationFrame } from "motion/react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 // Utility for wrapping numbers
 const wrap = (min: number, max: number, v: number) => {
@@ -87,9 +87,8 @@ const InteractionGraphic = () => {
   );
 };
 
-const MagneticItem = ({ mouseX, mouseY }: { mouseX: number, mouseY: number }) => {
+const MagneticItem: React.FC<{ mouseX: number, mouseY: number }> = ({ mouseX, mouseY }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!ref.current) return;

@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useVelocity, useAnimationFrame } from "motion/react";
-import { useRef, useContext } from "react";
+import { useRef, useContext, useMemo } from "react";
 import { ScrollContext } from "../App";
 
 // Utility for wrapping numbers
@@ -41,7 +41,7 @@ const AIProductAnimation = () => {
   for (let i = 6; i < 9; i++) for (let j = 9; j < 11; j++) connections.push([i, j]);
 
   return (
-    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
+    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform">
       {/* Browser UI */}
       <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -146,7 +146,7 @@ const AIProductAnimation = () => {
    2. WEB APP / DASHBOARD ANIMATION (preserved)
    ═══════════════════════════════════════════════════ */
 const WebAppAnimation = () => (
-  <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
+  <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform">
     {/* Browser UI */}
     <div className="h-[clamp(1.5rem,2vw,3rem)] bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
       <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
@@ -249,7 +249,7 @@ const APIFlowAnimation = () => {
   const hub = { x: 127, y: 85 };
 
   return (
-    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md transition-shadow duration-500">
+    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform">
       {/* Browser UI */}
       <div className="h-[clamp(1.5rem,2vw,3rem)] bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
@@ -422,7 +422,64 @@ const expertiseAreas = [
 ];
 
 /* ═══════════════════════════════════════════════════
-   PARALLAX TEXT (unchanged)
+   PREMIUM STAGGERED REVEAL TEXT
+   ═══════════════════════════════════════════════════ */
+const StaggeredTextReveal = ({ text, className, delayOffset = 0 }: { text: string; className?: string; delayOffset?: number }) => {
+  const words = text.split(" ");
+  
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({
+      opacity: 1,
+      transition: { staggerChildren: 0.05, delayChildren: delayOffset * i },
+    }),
+  };
+
+  const child = {
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      filter: "blur(0px)",
+      transition: {
+        type: "spring",
+        damping: 20,
+        stiffness: 100,
+      },
+    },
+    hidden: {
+      opacity: 0,
+      y: 20,
+      rotateX: -45,
+      filter: "blur(10px)",
+    },
+  };
+
+  return (
+    <motion.div
+      style={{ display: "inline-block", perspective: "1000px" }}
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-50px" }}
+      className={className}
+    >
+      {words.map((word, index) => (
+        <motion.span
+          variants={child}
+          style={{ display: "inline-block", marginRight: "0.25em", willChange: "transform, opacity, filter" }}
+          key={index}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </motion.div>
+  );
+};
+
+
+/* ═══════════════════════════════════════════════════
+   PARALLAX TEXT WITH GLOW EFFECT
    ═══════════════════════════════════════════════════ */
 function ParallaxText({ children, baseVelocity = 100 }: { children: string; baseVelocity: number }) {
   const baseX = useMotionValue(0);
@@ -455,10 +512,22 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
   });
 
   return (
-    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap">
+    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap relative py-4">
+      {/* Subtle animated blur glow behind the text to boost the wow effect */}
+      <motion.div 
+        className="absolute top-1/2 left-0 right-0 h-1/2 bg-gradient-to-r from-zinc-500/0 via-zinc-200/50 to-zinc-500/0 -translate-y-1/2 blur-2xl pointer-events-none z-[-1]"
+        animate={{ opacity: [0.3, 0.6, 0.3], scaleY: [1, 1.2, 1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
       <motion.div className="flex whitespace-nowrap gap-[clamp(1rem,2vw,3rem)] flex-nowrap" style={{ x }}>
         {[...Array(8)].map((_, i) => (
-          <span key={i} className="block text-[clamp(3rem,6vw,10rem)] font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>{children} </span>
+          <span 
+            key={i} 
+            className="block text-[clamp(4rem,8vw,12rem)] font-bold uppercase leading-[0.85] tracking-tight text-white drop-shadow-md mix-blend-difference" 
+            style={{ WebkitTextStroke: "1px rgba(0,0,0,0.15)" }}
+          >
+            {children} 
+          </span>
         ))}
       </motion.div>
     </div>
@@ -469,21 +538,66 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
    MAIN COMPONENT
    ═══════════════════════════════════════════════════ */
 export function Expertise() {
+  // Floating background decorative particles
+  const particles = useMemo(() => Array.from({ length: 15 }).map(() => ({
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 200 + 50,
+    duration: Math.random() * 20 + 20,
+  })), []);
+
   return (
-    <section id="expertise" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+    <section id="expertise" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-zinc-50">
+      
+      {/* Decorative premium background blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+        {particles.map((p, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full bg-zinc-200/50 blur-[80px]"
+              style={{
+                  width: p.size,
+                  height: p.size,
+                  left: `${p.x}%`,
+                  top: `${p.y}%`,
+              }}
+              animate={{
+                  y: ["-30vh", "30vh"],
+                  x: ["-20vw", "20vw"],
+                  opacity: [0.1, 0.4, 0.1],
+                  scale: [1, 1.2, 1]
+              }}
+              transition={{
+                  duration: p.duration,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                  delay: i * -5,
+              }}
+            />
+        ))}
+      </div>
+
       {/* Premium Divider / Parallax Text */}
-      <div className="relative py-[clamp(1rem,2vw,3rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0">
-        <ParallaxText baseVelocity={-1}>EXPERTISE • </ParallaxText>
+      <div className="relative py-[clamp(1rem,2vw,3rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0 mt-8">
+        <ParallaxText baseVelocity={-1.5}>EXPERTISE • </ParallaxText>
       </div>
 
       <div className="w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-[clamp(0.5rem,1.5vw,3vw)] flex justify-center relative z-10">
         {/* Simulated Mac Window */}
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0, y: 80, scale: 0.95, rotateX: 10 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-[min(98vw,160rem)] max-h-[85vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-2xl border border-zinc-200 overflow-hidden"
+          transition={{ 
+            duration: 1.2, 
+            type: "spring", 
+            bounce: 0.3,
+            ease: "easeOut",
+            willChange: "transform, opacity"
+          }}
+          style={{ perspective: "1500px" }}
+          className="w-full max-w-[min(98vw,160rem)] max-h-[85vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
         >
           {/* Window Header */}
           <div className="bg-white/80 backdrop-blur-md border-b border-zinc-200/50 px-[clamp(1rem,2vw,2.5rem)] py-[clamp(0.5rem,1vw,1.25rem)] flex items-center gap-[clamp(0.5rem,0.8vw,1.5rem)] sticky top-0 z-10">
@@ -492,31 +606,41 @@ export function Expertise() {
               <div className="w-[clamp(0.75rem,0.8vw,1.25rem)] h-[clamp(0.75rem,0.8vw,1.25rem)] rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
               <div className="w-[clamp(0.75rem,0.8vw,1.25rem)] h-[clamp(0.75rem,0.8vw,1.25rem)] rounded-full bg-[#28C840] border border-[#1AAB29]" />
             </div>
-            <div className="ml-[clamp(1rem,2vw,3rem)] text-[clamp(0.8rem,1vw,1.2rem)] font-medium text-zinc-400 font-mono flex-1 text-center pr-[clamp(3rem,6vw,8rem)]">
+            <div className="ml-[clamp(1rem,2vw,3rem)] text-[clamp(0.8rem,1vw,1.2rem)] font-medium text-zinc-400 font-mono flex-1 text-center pr-[clamp(3rem,6vw,8rem)] tracking-tight">
               robert_musin_expertise.tsx
             </div>
           </div>
 
           {/* Window Content */}
-          <div className="p-[clamp(1rem,2.5vw,6rem)] grid grid-cols-1 md:grid-cols-3 gap-[clamp(1rem,2.5vw,5rem)] bg-white flex-1 overflow-y-auto w-full">
+          <div className="p-[clamp(1rem,2.5vw,6rem)] grid grid-cols-1 md:grid-cols-3 gap-[clamp(1rem,2.5vw,5rem)] bg-white flex-1 overflow-y-auto w-full custom-scrollbar">
             {expertiseAreas.map((area, i) => (
               <motion.div
                 key={area.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: i * 0.15,
+                  type: "spring",
+                  bounce: 0.2
+                }}
                 className="group flex flex-col gap-[clamp(1rem,1.5vw,2.5rem)] h-full w-full"
+                style={{ willChange: "transform, opacity, filter" }}
               >
                 {/* Animation Container */}
-                <div className="w-full h-auto aspect-[4/3] flex items-center justify-center">
+                <div className="w-full h-auto aspect-[4/3] flex items-center justify-center relative">
                   <area.animation />
+                  {/* Subtle reflection under animation */}
+                  <div className="absolute -bottom-8 left-0 right-0 h-8 bg-gradient-to-b from-black/5 to-transparent blur-md transform -scale-y-100 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
 
                 <div className="flex flex-col gap-[clamp(0.5rem,0.8vw,1.5rem)] mt-auto flex-1">
-                  <h3 className="text-[clamp(1.2rem,1.8vw,3rem)] font-medium text-zinc-900 tracking-tight leading-tight">
-                    {area.title}
-                  </h3>
+                  <StaggeredTextReveal 
+                    text={area.title}
+                    className="text-[clamp(1.2rem,1.8vw,3rem)] font-medium text-zinc-900 tracking-tight leading-tight" 
+                    delayOffset={i * 0.1 + 0.2}
+                  />
                   <p className="text-zinc-500 leading-snug font-light text-[clamp(0.85rem,1vw,1.8rem)]">
                     {area.description}
                   </p>
