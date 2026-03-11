@@ -52,14 +52,16 @@ export function Platform() {
       
       // Update Physics State
       if (shouldFall) {
-        // Let wrong-color blocks fall by making them dynamic
-        body.setBodyType(0, true); // 0 = Dynamic
-      } else {
-        // Reset to kinematic and reset position
-        body.setBodyType(2, true); // 2 = Kinematic Position Based
+        // Optimization: Instant disappearance instead of falling physics to maintain 60FPS
+        body.setBodyType(2, true); // Ensure it's Kinematic
         const x = (i % GRID_SIZE) - 9.5;
         const z = Math.floor(i / GRID_SIZE) - 9.5;
-        // Make sure to wake the body up and clear forces so it doesn't get stuck sleeping or flying away
+        body.setTranslation({ x: x * 2, y: -100, z: z * 2 }, true);
+      } else {
+        // Active or Reset: Position at floor level
+        body.setBodyType(2, true); // Kinematic
+        const x = (i % GRID_SIZE) - 9.5;
+        const z = Math.floor(i / GRID_SIZE) - 9.5;
         body.wakeUp();
         body.setTranslation({ x: x * 2, y: -0.5, z: z * 2 }, true);
         body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
