@@ -148,7 +148,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
                    <TrendingUp size={24} className="text-white" />
                 </div>
               </div>
-
+              
               {/* "PROFILE" pulse tag */}
               <div className="absolute -bottom-1 bg-indigo-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border-2 border-slate-900 z-20 shadow-md">
                 PROFILE
