@@ -45,7 +45,7 @@ export function Player() {
   const broadcastMovement = useMultiplayerStore(state => state.broadcastMovement);
   const equippedSkin = useProfileStore(state => state.profile?.equipped_skin || 'default_skin');
 
-  const israelTexture = useLoader(THREE.TextureLoader, '/skins/israel_skin.png');
+  const israelTexture = useLoader(THREE.TextureLoader, import.meta.env.BASE_URL + 'skins/israel_skin.png');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

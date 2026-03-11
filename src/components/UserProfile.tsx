@@ -10,12 +10,12 @@ import { PurchaseCelebration } from './PurchaseCelebration';
 import { SkinAcquisitionHero } from './SkinAcquisitionHero';
 
 const PB_BUNDLES = [
-  { id: 'b1', name: 'Handful of Blocks', pbAmount: 1000, priceUsd: 0.99, valueProp: 'Perfect for a quick skin!', image: '/bundles/bundle_handful.png' },
-  { id: 'b2', name: 'Block Pouch', pbAmount: 3500, priceUsd: 2.99, valueProp: '+15% Extra Value', image: '/bundles/bundle_pouch.png' },
-  { id: 'b3', name: 'Party Chest', pbAmount: 8500, priceUsd: 4.99, valueProp: 'MOST POPULAR', image: '/bundles/bundle_chest.png' },
-  { id: 'b4', name: 'Hoard of Blocks', pbAmount: 20000, priceUsd: 9.99, valueProp: 'BEST VALUE', image: '/bundles/bundle_hoard.png' },
-  { id: 'b5', name: 'Founder’s Vault', pbAmount: 50000, priceUsd: 19.99, valueProp: 'Ultimate Collection', image: '/bundles/bundle_vault.png' },
-  { id: 'b6', name: 'Whale Stash', pbAmount: 125000, priceUsd: 49.99, valueProp: 'MAXIMUM PRESTIGE', image: '/bundles/bundle_vault.png' },
+  { id: 'b1', name: 'Handful of Blocks', pbAmount: 1000, priceUsd: 0.99, valueProp: 'Perfect for a quick skin!', image: import.meta.env.BASE_URL + 'bundles/bundle_handful.png' },
+  { id: 'b2', name: 'Block Pouch', pbAmount: 3500, priceUsd: 2.99, valueProp: '+15% Extra Value', image: import.meta.env.BASE_URL + 'bundles/bundle_pouch.png' },
+  { id: 'b3', name: 'Party Chest', pbAmount: 8500, priceUsd: 4.99, valueProp: 'MOST POPULAR', image: import.meta.env.BASE_URL + 'bundles/bundle_chest.png' },
+  { id: 'b4', name: 'Hoard of Blocks', pbAmount: 20000, priceUsd: 9.99, valueProp: 'BEST VALUE', image: import.meta.env.BASE_URL + 'bundles/bundle_hoard.png' },
+  { id: 'b5', name: 'Founder’s Vault', pbAmount: 50000, priceUsd: 19.99, valueProp: 'Ultimate Collection', image: import.meta.env.BASE_URL + 'bundles/bundle_vault.png' },
+  { id: 'b6', name: 'Whale Stash', pbAmount: 125000, priceUsd: 49.99, valueProp: 'MAXIMUM PRESTIGE', image: import.meta.env.BASE_URL + 'bundles/bundle_vault.png' },
 ];
 
 interface UserProfileProps {

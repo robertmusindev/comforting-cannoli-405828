@@ -148,7 +148,7 @@ function HeroCharacter({ progress }: { progress: number }) {
   // In a real app, load the flag texture
   const texture = React.useMemo(() => {
     const loader = new THREE.TextureLoader();
-    return loader.load('/skins/israel_skin.png');
+    return loader.load(import.meta.env.BASE_URL + 'skins/israel_skin.png');
   }, []);
 
   return (
