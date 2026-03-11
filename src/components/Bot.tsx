@@ -8,6 +8,12 @@ import { useGameStore, COLORS } from '../store';
 const SPEED = 9.5; // Slightly slower than player
 const JUMP_FORCE = 8;
 
+const _direction = new THREE.Vector3();
+const _currentVelocity = new THREE.Vector3();
+const _targetQuaternion = new THREE.Quaternion();
+const _upVector = new THREE.Vector3(0, 1, 0);
+const _scaleVector = new THREE.Vector3();
+
 export function Bot({ id, name }: { id: number; name: string }) {
   const bodyRef = useRef<any>(null);
   const avatarRef = useRef<THREE.Group>(null);
@@ -19,6 +25,8 @@ export function Bot({ id, name }: { id: number; name: string }) {
   
   const [targetBlock, setTargetBlock] = useState<{x: number, z: number} | null>(null);
   const [reactionTimer, setReactionTimer] = useState(0);
+  const [aiState, setAiState] = useState<'idle' | 'wandering' | 'seeking' | 'waiting'>('wandering');
+  const [wanderTarget, setWanderTarget] = useState<{x: number, z: number} | null>(null);
 
   const { world } = useRapier();
   const gameState = useGameStore(state => state.gameState);
@@ -36,7 +44,7 @@ export function Bot({ id, name }: { id: number; name: string }) {
   const startPos = useMemo(() => {
     return [
       (Math.random() - 0.5) * 15,
-      10 + Math.random() * 10, // Drop from sky
+      5.5 + Math.random() * 2, // Spawns near the ground
       (Math.random() - 0.5) * 15
     ] as [number, number, number];
   }, []);
@@ -56,16 +64,21 @@ export function Bot({ id, name }: { id: number; name: string }) {
     const vel = { x: velocity.x, y: velocity.y, z: velocity.z };
     const isGrounded = pos.y <= 5.2 && Math.abs(vel.y) < 0.2;
     
-    // AI Logic
-    const direction = new THREE.Vector3();
-    
+    // AI Logic State Machine
+    _direction.set(0, 0, 0);
+
     if (gameState === 'playing' && targetColor) {
-      if (!targetBlock) {
-        // Delay decision slightly to simulate reaction time
+      if (aiState === 'wandering' || aiState === 'idle') {
+        // Transition to taking action, but wait for reaction time first
         if (reactionTimer > 0) {
           setReactionTimer(prev => prev - delta);
+          // Very small chance to jump randomly while confused/waiting to react
+          if (Math.random() < 0.05 * delta && isGrounded) {
+             bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
+             if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
+          }
         } else {
-          // Find closest target block
+          // Time to seek!
           const targetColorIndex = COLORS.findIndex(c => c.name === targetColor.name);
           let closestDist = Infinity;
           let bestBlock: {x: number, z: number} | null = null;
@@ -77,70 +90,147 @@ export function Bot({ id, name }: { id: number; name: string }) {
               const bz = Math.floor(bIndex / 20) - 9.5;
               const dist = Math.sqrt(Math.pow(bx * 2 - pos.x, 2) + Math.pow(bz * 2 - pos.z, 2));
               
-              // Add some randomness so bots don't all perfectly stack
-              const randomizedDist = dist + Math.random() * 8;
+              // Add randomness to distance so they don't all go to the exact same block
+              const randomizedDist = dist + Math.random() * 3;
               if (randomizedDist < closestDist) {
                 closestDist = randomizedDist;
-                bestBlock = { x: bx * 2 + (Math.random() - 0.5), z: bz * 2 + (Math.random() - 0.5) };
+                bestBlock = { x: bx * 2, z: bz * 2 };
               }
             }
           });
           
           if (bestBlock) {
-             // 10% chance the bot targets a random WRONG block to simulate dumb players dying
-             if (Math.random() < 0.1) {
-                const randomWrongIndex = Math.floor(Math.random() * 400);
-                const rx = (randomWrongIndex % 20) - 9.5;
-                const rz = Math.floor(randomWrongIndex / 20) - 9.5;
+             // 18% chance to go to a totally wrong block (so roughly 2 out of 11 bots die per round)
+             if (Math.random() < 0.18) {
+                const rIdx = Math.floor(Math.random() * 400);
+                const rx = (rIdx % 20) - 9.5;
+                const rz = Math.floor(rIdx / 20) - 9.5;
                 setTargetBlock({ x: rx * 2, z: rz * 2 });
              } else {
-                setTargetBlock(bestBlock);
+                // Add tiny jitter to inner-block position to spread them out on the safe block safely
+                setTargetBlock({ 
+                  x: bestBlock.x + (Math.random() * 0.8 - 0.4), 
+                  z: bestBlock.z + (Math.random() * 0.8 - 0.4) 
+                });
              }
+             setAiState('seeking');
           }
         }
-      } else {
+      } else if (aiState === 'seeking' && targetBlock) {
         // Move towards target
         const dx = targetBlock.x - pos.x;
         const dz = targetBlock.z - pos.z;
         const distToTarget = Math.sqrt(dx * dx + dz * dz);
         
-        if (distToTarget > 0.5) {
-          direction.set(dx, 0, dz).normalize().multiplyScalar(SPEED);
+          if (distToTarget > 0.8) {
+          _direction.set(dx, 0, dz).normalize().multiplyScalar(SPEED);
+          // Human-like jump while running to the block occasionally
+          if (Math.random() < 2.5 * delta && isGrounded) {
+             bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
+             if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
+          }
         } else {
-           // At target, occasionally jump
-           if (Math.random() < 0.01 && isGrounded && vel.y <= 0.1) {
-              bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
+           // Reached destination, switch to waiting
+           setAiState('waiting');
+           // Jump in celebration / position adjustment
+           if (isGrounded) {
+              bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE * 0.8, z: vel.z }, true);
+              if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
            }
         }
+      } else if (aiState === 'waiting' && targetBlock) {
+         // Stay put! But if pushed too far from target (e.g. by another player), run back to it.
+         const dx = targetBlock.x - pos.x;
+         const dz = targetBlock.z - pos.z;
+         const distToTarget = Math.sqrt(dx * dx + dz * dz);
+         
+         if (distToTarget > 1.2) {
+             setAiState('seeking');
+         } else {
+             // Small chance to jump while waiting safely
+             if (Math.random() < 3.0 * delta && isGrounded) {
+                bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE * 0.7, z: vel.z }, true);
+             }
+         }
       }
+    } else if (gameState === 'elimination' || gameState === 'gameover' || gameState === 'victory') {
+         // Blocks are falling or game is over! Stand still on the block!
+         if (aiState !== 'idle') {
+             setAiState('idle');
+             setTargetBlock(null);
+             setWanderTarget(null);
+             // Randomly set reaction time for NEXT round so they survive better
+             setReactionTimer(0.1 + Math.random() * 0.7); 
+         }
+         
+         // Celebrate/panic by jumping in place occasionally
+         if (Math.random() < 0.3 * delta && isGrounded) {
+             bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
+             if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
+         }
     } else {
-      // Not playing, reset target
-      if (targetBlock) {
+      // Waiting lobby / between rounds
+      if (aiState !== 'wandering') {
+        setAiState('wandering');
         setTargetBlock(null);
-        setReactionTimer(0.2 + Math.random() * 1.5); // Random reaction time for next round
+        setWanderTarget(null);
       }
       
-      // Random wander slightly
-      if (Math.random() < 0.01 && isGrounded && vel.y <= 0.1) {
+      // Wandering Logic (between rounds)
+      if (!wanderTarget || Math.random() < 0.5 * delta) {
+         // Pick new wander target nearby
+         setWanderTarget({
+            x: Math.max(-18, Math.min(18, pos.x + (Math.random() - 0.5) * 10)),
+            z: Math.max(-18, Math.min(18, pos.z + (Math.random() - 0.5) * 10))
+         });
+      }
+
+      if (wanderTarget) {
+         const dx = wanderTarget.x - pos.x;
+         const dz = wanderTarget.z - pos.z;
+         const dist = Math.sqrt(dx * dx + dz * dz);
+         
+         if (dist > 1.0) {
+            // Wander slower than running speed
+            _direction.set(dx, 0, dz).normalize().multiplyScalar(SPEED * 0.4);
+         }
+      }
+
+      // Random jump while wandering
+      if (Math.random() < 0.3 * delta && isGrounded && vel.y <= 0.1) {
           bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
+          if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
       }
     }
 
-
-    const currentVelocity = new THREE.Vector3(vel.x, 0, vel.z);
+    _currentVelocity.set(vel.x, 0, vel.z);
     const controlFactor = isGrounded ? 1 - Math.exp(-25 * delta) : 1 - Math.exp(-5 * delta);
-    currentVelocity.lerp(direction, controlFactor);
-    bodyRef.current.setLinvel({ x: currentVelocity.x, y: vel.y, z: currentVelocity.z }, true);
+    _currentVelocity.lerp(_direction, controlFactor);
+    bodyRef.current.setLinvel({ x: _currentVelocity.x, y: vel.y, z: _currentVelocity.z }, true);
 
     // Rotation
-    if (direction.lengthSq() > 0.1 && avatarRef.current) {
-      const targetAngle = Math.atan2(direction.x, direction.z);
-      const targetQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetAngle);
-      avatarRef.current.quaternion.slerp(targetQuaternion, 1 - Math.exp(-15 * delta));
+    if (_direction.lengthSq() > 0.1 && avatarRef.current) {
+      const targetAngle = Math.atan2(_direction.x, _direction.z);
+      _targetQuaternion.setFromAxisAngle(_upVector, targetAngle);
+      avatarRef.current.quaternion.slerp(_targetQuaternion, 1 - Math.exp(-15 * delta));
+    }
+
+    // Squash and stretch
+    if (avatarRef.current) {
+      const yVel = vel.y;
+      if (!isGrounded) {
+        const stretch = Math.max(0.7, Math.min(1.3, 1 + yVel * 0.04));
+        const squash = 1 / Math.sqrt(stretch);
+        _scaleVector.set(squash, stretch, squash);
+        avatarRef.current.scale.lerp(_scaleVector, 1 - Math.exp(-20 * delta));
+      } else {
+        _scaleVector.set(1, 1, 1);
+        avatarRef.current.scale.lerp(_scaleVector, 1 - Math.exp(-15 * delta));
+      }
     }
 
     // Walking animation
-    const speed = currentVelocity.length();
+    const speed = _currentVelocity.length();
     if (isGrounded && speed > 0.5) {
       walkTime.current += delta * speed * 1.5;
       const armSwing = Math.sin(walkTime.current) * 0.5;
@@ -159,7 +249,7 @@ export function Bot({ id, name }: { id: number; name: string }) {
   });
 
   return (
-    <RigidBody ref={bodyRef} colliders={false} position={startPos} enabledRotations={[false, false, false]}>
+    <RigidBody ref={bodyRef} ccd={true} colliders={false} position={startPos} enabledRotations={[false, false, false]}>
       <CapsuleCollider args={[0.5, 0.5]} friction={0} />
       <group ref={avatarRef} position={[0, -0.5, 0]}>
          {/* Head */}

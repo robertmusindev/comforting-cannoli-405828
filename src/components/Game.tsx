@@ -4,7 +4,9 @@ import { Sky, Environment } from '@react-three/drei';
 import { Platform } from './Platform';
 import { Player } from './Player';
 import { Bot } from './Bot';
+import { NetworkPlayer } from './NetworkPlayer';
 import { useGameStore, BOT_NAMES } from '../store';
+import { useMultiplayerStore } from '../store/multiplayer';
 import * as THREE from 'three';
 
 function GameLogic() {
@@ -31,6 +33,13 @@ export function Game() {
   const gameState = useGameStore(state => state.gameState);
   const gameId = useGameStore(state => state.gameId);
   const aliveBots = useGameStore(state => state.aliveBots);
+  
+  const lobbyId = useMultiplayerStore(state => state.lobbyId);
+  const players = useMultiplayerStore(state => state.players);
+  const myPlayerId = useMultiplayerStore(state => state.myPlayerId);
+
+  // Filter out the local player so we don't render them twice (Player.tsx handles our local physics)
+  const remotePlayers = players.filter(p => p.id !== myPlayerId);
 
   return (
     <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 10, 15], fov: 50 }}>
@@ -55,7 +64,21 @@ export function Game() {
         {(gameState === 'playing' || gameState === 'elimination') && (
           <>
             <Player key={`player-${gameId}`} />
-            {aliveBots.map(id => (
+            
+            {/* Realtime Players */}
+            {lobbyId && remotePlayers.map(p => (
+              <NetworkPlayer 
+                key={`net-${gameId}-${p.id}`} 
+                id={p.id} 
+                name={p.name} 
+                position={p.position || [0, 5, 0]} 
+                rotation={p.rotation}
+                isEliminated={p.isEliminated} 
+              />
+            ))}
+
+            {/* AI Bots (Only in Singleplayer) */}
+            {!lobbyId && aliveBots.map(id => (
               <Bot key={`bot-${gameId}-${id}`} id={id} name={BOT_NAMES[id]} />
             ))}
           </>

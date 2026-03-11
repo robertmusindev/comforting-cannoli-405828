@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+:root {
+  --font-family: 'Nunito', 'Poppins', sans-serif;
+  --font-display: 'Luckiest Guy', cursive;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+body {
+  font-family: var(--font-family);
+  user-select: none;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Chrome, Safari, Edge, Opera reset arrows for numbers */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

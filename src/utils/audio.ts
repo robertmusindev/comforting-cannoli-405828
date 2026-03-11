@@ -178,6 +178,66 @@ class AudioController {
       console.error('Audio error', e);
     }
   }
+
+  playCoinSound() {
+    try {
+      const ctx = this.getContext();
+      const now = ctx.currentTime;
+      
+      // Festive "ding-ding" sequence
+      [880, 1318].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.1);
+        
+        gain.gain.setValueAtTime(0, now + i * 0.1);
+        gain.gain.linearRampToValueAtTime(0.1, now + i * 0.1 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(now + i * 0.1);
+        osc.stop(now + i * 0.1 + 0.3);
+      });
+    } catch (e) {
+      console.error('Audio error', e);
+    }
+  }
+
+  playLargeCoinShower() {
+    try {
+      const ctx = this.getContext();
+      const now = ctx.currentTime;
+      const duration = 2.5;
+      
+      // Create a sequence of coin dings over duration
+      for (let i = 0; i < 20; i++) {
+        const startTime = now + Math.random() * duration;
+        const freq = 800 + Math.random() * 1200;
+        
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.05, startTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(startTime);
+        osc.stop(startTime + 0.2);
+      }
+    } catch (e) {
+      console.error('Audio error', e);
+    }
+  }
 }
 
 export const audio = new AudioController();
