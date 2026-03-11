@@ -9,10 +9,37 @@ import { useGameStore, BOT_NAMES } from '../store';
 import { useMultiplayerStore } from '../store/multiplayer';
 import * as THREE from 'three';
 
+import { uiRefs } from '../utils/ui-refs';
+
 function GameLogic() {
   const tick = useGameStore(state => state.tick);
+  const maxTime = useGameStore(state => state.maxTime);
+  
   useFrame((state, delta) => {
     tick(delta);
+
+    // Update Timer UI Refs (High Performance, No React Re-render for the whole App)
+    const gameState = useGameStore.getState().gameState;
+    if (uiRefs.timerBar || uiRefs.timerText) {
+      if (gameState === 'playing' || gameState === 'elimination') {
+        const timeLeft = useGameStore.getState().timeLeft;
+        const progress = Math.max(0, timeLeft / maxTime) * 100;
+
+        if (uiRefs.timerBar) {
+          uiRefs.timerBar.style.width = `${progress}%`;
+          if (timeLeft < 1.5) {
+            uiRefs.timerBar.style.backgroundColor = '#ef4444';
+          } else if (timeLeft < 3) {
+            uiRefs.timerBar.style.backgroundColor = '#eab308';
+          } else {
+            uiRefs.timerBar.style.backgroundColor = '#22c55e';
+          }
+        }
+        if (uiRefs.timerText) {
+          uiRefs.timerText.innerText = gameState === 'playing' ? `${timeLeft.toFixed(1)}s` : '0.0s';
+        }
+      }
+    }
   });
   return null;
 }

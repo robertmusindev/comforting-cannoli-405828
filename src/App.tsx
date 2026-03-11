@@ -4,7 +4,7 @@ import { useAuthStore } from './store/auth';
 import { useMultiplayerStore } from './store/multiplayer';
 import { useI18nStore } from './store/i18n';
 import { memo, useEffect, useState, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { uiRefs } from './utils/ui-refs';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Trophy, Play, User, LogOut, Loader2, LogIn, UserPlus, Ghost, AlertCircle, Users, Copy, ArrowLeft, Coins, Star, Bell, X, RotateCcw, Target } from 'lucide-react';
@@ -19,31 +19,15 @@ const TimerBar = memo(() => {
   const barRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const maxTime = useGameStore(state => state.maxTime);
-  const gameState = useGameStore(state => state.gameState);
 
-  useFrame(() => {
-    if (gameState !== 'playing' && gameState !== 'elimination') return;
-    
-    const store = useGameStore.getState();
-    const timeLeft = store.timeLeft;
-    const progress = Math.max(0, timeLeft / maxTime) * 100;
-
-    if (barRef.current) {
-      barRef.current.style.width = `${progress}%`;
-      // Update color manually to avoid state transition overhead
-      if (timeLeft < 1.5) {
-        barRef.current.style.backgroundColor = '#ef4444'; // red-500
-      } else if (timeLeft < 3) {
-        barRef.current.style.backgroundColor = '#eab308'; // yellow-500
-      } else {
-        barRef.current.style.backgroundColor = '#22c55e'; // green-500
-      }
-    }
-    
-    if (textRef.current) {
-      textRef.current.innerText = gameState === 'playing' ? `${timeLeft.toFixed(1)}s` : '0.0s';
-    }
-  });
+  useEffect(() => {
+    uiRefs.timerBar = barRef.current;
+    uiRefs.timerText = textRef.current;
+    return () => {
+      uiRefs.timerBar = null;
+      uiRefs.timerText = null;
+    };
+  }, []);
 
   return (
     <div className="w-full max-w-lg mt-4 flex flex-col items-center">
