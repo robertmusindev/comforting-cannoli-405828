@@ -87,7 +87,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   spawnedCoins: [],
   
   setUsername: (name: string) => set({ username: name }),
-  setHoveredBlock: (index: number) => set({ hoveredBlockIndex: index }),
+  setHoveredBlock: (index: number) => {
+    if (get().hoveredBlockIndex === index) return;
+    set({ hoveredBlockIndex: index });
+  },
 
   startGame: () => {
     const { isHost, channel, lobbyId } = useMultiplayerStore.getState();

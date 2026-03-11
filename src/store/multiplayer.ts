@@ -117,14 +117,12 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
           set({ players: uniquePlayers });
         })
         .on('broadcast', { event: 'movement' }, (payload) => {
-           // Handle incoming movement (to be implemented later in the game loop)
-           set(state => ({
-             players: state.players.map(p => 
-               p.id === payload.payload.playerId 
-                 ? { ...p, position: payload.payload.position, rotation: payload.payload.rotation }
-                 : p
-             )
-           }));
+           const { playerId, position, rotation } = payload.payload;
+           // Optimized: Store in a global non-reactive buffer instead of React state
+           if (typeof window !== 'undefined') {
+             (window as any).remotePlayerBuffer = (window as any).remotePlayerBuffer || {};
+             (window as any).remotePlayerBuffer[playerId] = { position, rotation, timestamp: Date.now() };
+           }
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
@@ -157,7 +155,6 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     try {
       const actualPlayerId = authId || `guest-${Date.now()}`;
       
-      // Check if lobby exists
       const { data: lobby, error: lobbyError } = await withRetry(async () =>
         await supabase.from('lobbies')
           .select('*')
@@ -165,15 +162,10 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
           .maybeSingle()
       );
 
-      if (lobbyError) {
-        console.error("Supabase Error during Join:", lobbyError);
-        throw new Error(`Errore connessione: ${lobbyError.message}`);
-      }
-      
+      if (lobbyError) throw new Error(`Errore connessione: ${lobbyError.message}`);
       if (!lobby) throw new Error("Stanza non trovata! Controlla il codice.");
       if (lobby.status !== 'waiting') throw new Error("Partita già in corso!");
 
-      // Join DB table
       const { data: playerData, error: playerError } = await withRetry(async () =>
         await supabase.from('lobby_players')
           .insert({
@@ -188,7 +180,6 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
         
       if (playerError) throw playerError;
 
-      // Connect to Realtime Channel
       const channel = supabase.channel(`room:${lobby.id}`, {
         config: {
           presence: { key: playerData.id },
@@ -223,13 +214,11 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
            useGameStore.getState().networkEliminatePlayer(payload.payload.playerId);
         })
         .on('broadcast', { event: 'movement' }, (payload) => {
-           set(state => ({
-             players: state.players.map(p => 
-               p.id === payload.payload.playerId 
-                 ? { ...p, position: payload.payload.position, rotation: payload.payload.rotation }
-                 : p
-             )
-           }));
+           const { playerId, position, rotation } = payload.payload;
+           if (typeof window !== 'undefined') {
+             (window as any).remotePlayerBuffer = (window as any).remotePlayerBuffer || {};
+             (window as any).remotePlayerBuffer[playerId] = { position, rotation, timestamp: Date.now() };
+           }
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
@@ -265,11 +254,9 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     }
     
     if (myPlayerId) {
-       // Clean up from DB
        try {
          await supabase.from('lobby_players').delete().eq('id', myPlayerId);
          if (isHost && lobbyId) {
-            // If host leaves, close the room
             await supabase.from('lobbies').delete().eq('id', lobbyId);
          }
        } catch (e) {
@@ -284,8 +271,6 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
      const { channel, myPlayerId } = get();
      if (!channel || !myPlayerId) return;
      
-     // Note: In a production rapid 60fps game, you wouldn't send this via React state strictly, 
-     // but directly via Supabase client, and limit the rate (e.g. 10-15hz).
      channel.send({
        type: 'broadcast',
        event: 'movement',

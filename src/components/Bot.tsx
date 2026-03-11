@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { Billboard, Text } from '@react-three/drei';
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier';
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useGameStore, COLORS } from '../store';
 
@@ -23,7 +23,6 @@ export function Bot({ id, name }: { id: number; name: string }) {
   const rightArmRef = useRef<THREE.Mesh>(null);
   const walkTime = useRef(Math.random() * 10); // Offset animation per bot
   
-  const [targetBlock, setTargetBlock] = useState<{x: number, z: number} | null>(null);
   const [reactionTimer, setReactionTimer] = useState(0);
   const [aiState, setAiState] = useState<'idle' | 'wandering' | 'seeking' | 'waiting'>('wandering');
   const [wanderTarget, setWanderTarget] = useState<{x: number, z: number} | null>(null);
@@ -33,6 +32,7 @@ export function Bot({ id, name }: { id: number; name: string }) {
   const targetColor = useGameStore(state => state.targetColor);
   const gridColors = useGameStore(state => state.gridColors);
   const eliminateBot = useGameStore(state => state.eliminateBot);
+  const targetBlockRef = useRef<{x: number, z: number} | null>(null);
 
   // Random torso color per bot
   const torsoColor = useMemo(() => {
@@ -49,6 +49,49 @@ export function Bot({ id, name }: { id: number; name: string }) {
     ] as [number, number, number];
   }, []);
 
+  // AI Logic calculation (High performance: don't scan 400 blocks every frame!)
+  useEffect(() => {
+    if (gameState === 'playing' && targetColor) {
+      const targetColorIndex = COLORS.findIndex(c => c.name === targetColor.name);
+      let closestDist = Infinity;
+      let bestBlock: {x: number, z: number} | null = null;
+      
+      const currentPos = bodyRef.current?.translation() || { x: 0, z: 0 };
+
+      gridColors.forEach((colorIndex, i) => {
+        if (colorIndex === targetColorIndex) {
+          const bx = (i % 20) - 9.5;
+          const bz = Math.floor(i / 20) - 9.5;
+          const dist = Math.sqrt(Math.pow(bx * 2 - currentPos.x, 2) + Math.pow(bz * 2 - currentPos.z, 2));
+          
+          // Add some per-bot variation
+          const randomizedDist = dist + (id % 5); 
+          if (randomizedDist < closestDist) {
+            closestDist = randomizedDist;
+            bestBlock = { x: bx * 2, z: bz * 2 };
+          }
+        }
+      });
+      
+      if (bestBlock) {
+        // 18% chance to go to a totally wrong block
+        if (Math.random() < 0.18) {
+          const rIdx = Math.floor(Math.random() * 400);
+          const rx = (rIdx % 20) - 9.5;
+          const rz = Math.floor(rIdx / 20) - 9.5;
+          targetBlockRef.current = { x: rx * 2, z: rz * 2 };
+        } else {
+          targetBlockRef.current = { 
+            x: bestBlock.x + (Math.random() * 0.8 - 0.4), 
+            z: bestBlock.z + (Math.random() * 0.8 - 0.4) 
+          };
+        }
+      }
+    } else {
+      targetBlockRef.current = null;
+    }
+  }, [gameState, targetColor, gridColors, id]);
+
   useFrame((state, delta) => {
     if (!bodyRef.current) return;
 
@@ -62,7 +105,7 @@ export function Bot({ id, name }: { id: number; name: string }) {
 
     const velocity = bodyRef.current.linvel();
     const vel = { x: velocity.x, y: velocity.y, z: velocity.z };
-    const isGrounded = pos.y <= 5.2 && Math.abs(vel.y) < 0.2;
+    const isGrounded = pos.y <= 1.2 && Math.abs(vel.y) < 2.0; // Updated ground check to match player
     
     // AI Logic State Machine
     _direction.set(0, 0, 0);
@@ -72,92 +115,50 @@ export function Bot({ id, name }: { id: number; name: string }) {
         // Transition to taking action, but wait for reaction time first
         if (reactionTimer > 0) {
           setReactionTimer(prev => prev - delta);
-          // Very small chance to jump randomly while confused/waiting to react
           if (Math.random() < 0.05 * delta && isGrounded) {
              bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
              if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
           }
         } else {
-          // Time to seek!
-          const targetColorIndex = COLORS.findIndex(c => c.name === targetColor.name);
-          let closestDist = Infinity;
-          let bestBlock: {x: number, z: number} | null = null;
-          
-          Object.entries(gridColors).forEach(([idx, colorIndex]) => {
-            if (colorIndex === targetColorIndex) {
-              const bIndex = parseInt(idx);
-              const bx = (bIndex % 20) - 9.5;
-              const bz = Math.floor(bIndex / 20) - 9.5;
-              const dist = Math.sqrt(Math.pow(bx * 2 - pos.x, 2) + Math.pow(bz * 2 - pos.z, 2));
-              
-              // Add randomness to distance so they don't all go to the exact same block
-              const randomizedDist = dist + Math.random() * 3;
-              if (randomizedDist < closestDist) {
-                closestDist = randomizedDist;
-                bestBlock = { x: bx * 2, z: bz * 2 };
-              }
-            }
-          });
-          
-          if (bestBlock) {
-             // 18% chance to go to a totally wrong block (so roughly 2 out of 11 bots die per round)
-             if (Math.random() < 0.18) {
-                const rIdx = Math.floor(Math.random() * 400);
-                const rx = (rIdx % 20) - 9.5;
-                const rz = Math.floor(rIdx / 20) - 9.5;
-                setTargetBlock({ x: rx * 2, z: rz * 2 });
-             } else {
-                // Add tiny jitter to inner-block position to spread them out on the safe block safely
-                setTargetBlock({ 
-                  x: bestBlock.x + (Math.random() * 0.8 - 0.4), 
-                  z: bestBlock.z + (Math.random() * 0.8 - 0.4) 
-                });
-             }
-             setAiState('seeking');
-          }
+          setAiState('seeking');
         }
-      } else if (aiState === 'seeking' && targetBlock) {
+      } else if (aiState === 'seeking' && targetBlockRef.current) {
         // Move towards target
-        const dx = targetBlock.x - pos.x;
-        const dz = targetBlock.z - pos.z;
+        const dx = targetBlockRef.current.x - pos.x;
+        const dz = targetBlockRef.current.z - pos.z;
         const distToTarget = Math.sqrt(dx * dx + dz * dz);
         
-          if (distToTarget > 0.8) {
+        if (distToTarget > 0.8) {
           _direction.set(dx, 0, dz).normalize().multiplyScalar(SPEED);
-          // Human-like jump while running to the block occasionally
           if (Math.random() < 2.5 * delta && isGrounded) {
              bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true);
              if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
           }
         } else {
-           // Reached destination, switch to waiting
-           setAiState('waiting');
-           // Jump in celebration / position adjustment
-           if (isGrounded) {
-              bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE * 0.8, z: vel.z }, true);
-              if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
-           }
+          setAiState('waiting');
+          if (isGrounded) {
+            bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE * 0.8, z: vel.z }, true);
+            if (avatarRef.current) avatarRef.current.scale.set(1.4, 0.6, 1.4);
+          }
         }
-      } else if (aiState === 'waiting' && targetBlock) {
-         // Stay put! But if pushed too far from target (e.g. by another player), run back to it.
-         const dx = targetBlock.x - pos.x;
-         const dz = targetBlock.z - pos.z;
+      } else if (aiState === 'waiting' && targetBlockRef.current) {
+         const dx = targetBlockRef.current.x - pos.x;
+         const dz = targetBlockRef.current.z - pos.z;
          const distToTarget = Math.sqrt(dx * dx + dz * dz);
          
          if (distToTarget > 1.2) {
-             setAiState('seeking');
+           setAiState('seeking');
          } else {
-             // Small chance to jump while waiting safely
-             if (Math.random() < 3.0 * delta && isGrounded) {
-                bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE * 0.7, z: vel.z }, true);
-             }
+           if (Math.random() < 3.0 * delta && isGrounded) {
+             bodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE * 0.7, z: vel.z }, true);
+           }
          }
       }
     } else if (gameState === 'elimination' || gameState === 'gameover' || gameState === 'victory') {
          // Blocks are falling or game is over! Stand still on the block!
          if (aiState !== 'idle') {
              setAiState('idle');
-             setTargetBlock(null);
+             targetBlockRef.current = null; // Corrected from setTargetBlock(null)
              setWanderTarget(null);
              // Randomly set reaction time for NEXT round so they survive better
              setReactionTimer(0.1 + Math.random() * 0.7); 
@@ -172,7 +173,7 @@ export function Bot({ id, name }: { id: number; name: string }) {
       // Waiting lobby / between rounds
       if (aiState !== 'wandering') {
         setAiState('wandering');
-        setTargetBlock(null);
+        targetBlockRef.current = null; // Corrected from setTargetBlock(null)
         setWanderTarget(null);
       }
       

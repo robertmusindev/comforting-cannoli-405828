@@ -48,7 +48,6 @@ export function NetworkPlayer({ name, position, rotation, isEliminated }: Networ
         if (!isFalling.current) {
             isFalling.current = true;
         }
-        // Fall down animation
         fallVelocity.current += 9.8 * delta * 2;
         group.current.position.y -= fallVelocity.current * delta;
         group.current.rotation.x += delta;
@@ -56,40 +55,37 @@ export function NetworkPlayer({ name, position, rotation, isEliminated }: Networ
         return;
     }
 
-    // Smooth movement directly to the target position
-    // Lerp factor of ~10-15 is good for ~15Hz updates to feel 60FPS
+    // Optimized: Read from non-reactive buffer
+    const buffer = (window as any).remotePlayerBuffer;
+    if (buffer && buffer[id]) {
+      const b = buffer[id];
+      targetPosition.current.set(b.position[0], b.position[1], b.position[2]);
+      
+      const euler = new THREE.Euler(b.rotation[0], b.rotation[1], b.rotation[2], 'XYZ');
+      const targetQuat = new THREE.Quaternion().setFromEuler(euler);
+      group.current.quaternion.slerp(targetQuat, 1 - Math.exp(-15 * delta));
+    }
+
     const lerpFactor = 1 - Math.exp(-12 * delta);
     const previousPos = group.current.position.clone();
     group.current.position.lerp(targetPosition.current, lerpFactor);
     
-    // Calculate speed for animation
-    if (!isEliminated) {
-      const distanceMoved = previousPos.distanceTo(group.current.position);
-      // If distance moved this frame is significant, player is walking
-      if (distanceMoved > 0.05) {
-        walkTime.current += delta * (distanceMoved / delta) * 0.5;
-        const armSwing = Math.sin(walkTime.current) * 0.5;
-        const legSwing = Math.sin(walkTime.current) * 0.6;
-        
-        if (leftArmRef.current) leftArmRef.current.rotation.x = armSwing;
-        if (rightArmRef.current) rightArmRef.current.rotation.x = -armSwing;
-        if (leftLegRef.current) leftLegRef.current.rotation.x = -legSwing;
-        if (rightLegRef.current) rightLegRef.current.rotation.x = legSwing;
-      } else {
-        // Return to idle
-        if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-        if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-        if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-        if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-        walkTime.current = 0;
-      }
-    }
-    
-    // Update rotation if provided
-    if (rotation) {
-        const euler = new THREE.Euler(rotation[0], rotation[1], rotation[2], 'XYZ');
-        const targetQuat = new THREE.Quaternion().setFromEuler(euler);
-        group.current.quaternion.slerp(targetQuat, 0.2);
+    const distanceMoved = previousPos.distanceTo(group.current.position);
+    if (distanceMoved > 0.05) {
+      walkTime.current += delta * (distanceMoved / delta) * 0.5;
+      const armSwing = Math.sin(walkTime.current) * 0.5;
+      const legSwing = Math.sin(walkTime.current) * 0.6;
+      
+      if (leftArmRef.current) leftArmRef.current.rotation.x = armSwing;
+      if (rightArmRef.current) rightArmRef.current.rotation.x = -armSwing;
+      if (leftLegRef.current) leftLegRef.current.rotation.x = -legSwing;
+      if (rightLegRef.current) rightLegRef.current.rotation.x = legSwing;
+    } else {
+      if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      walkTime.current = 0;
     }
   });
 
