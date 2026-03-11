@@ -369,7 +369,7 @@ export default function App() {
                 initial={{ scale: 0, opacity: 0, x: 20 }}
                 animate={{ scale: 1, opacity: 1, x: 0 }}
                 exit={{ scale: 0, opacity: 0, x: 20 }}
-                className="absolute top-36 right-4 md:top-48 md:right-8 z-[100] pointer-events-auto"
+                className="absolute top-36 right-2 md:top-48 md:right-4 z-[100] pointer-events-auto"
               >
                 <div className="flex flex-col items-center gap-2">
                   <motion.button
