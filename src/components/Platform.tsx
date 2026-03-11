@@ -59,6 +59,8 @@ export function Platform() {
         body.setBodyType(2, true); // 2 = Kinematic Position Based
         const x = (i % GRID_SIZE) - 9.5;
         const z = Math.floor(i / GRID_SIZE) - 9.5;
+        // Make sure to wake the body up and clear forces so it doesn't get stuck sleeping or flying away
+        body.wakeUp();
         body.setTranslation({ x: x * 2, y: -0.5, z: z * 2 }, true);
         body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
         body.setLinvel({ x: 0, y: 0, z: 0 }, true);
