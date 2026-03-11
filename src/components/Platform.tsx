@@ -52,12 +52,11 @@ export function Platform() {
       
       // Update Physics State
       if (shouldFall) {
-        // Let wrong-color blocks fall by moving them downward as kinematic bodies
-        const x = (i % GRID_SIZE) - 9.5;
-        const z = Math.floor(i / GRID_SIZE) - 9.5;
-        body.setNextKinematicTranslation({ x: x * 2, y: -20, z: z * 2 });
+        // Let wrong-color blocks fall by making them dynamic
+        body.setBodyType(0, true); // 0 = Dynamic
       } else {
-        // Reset position on round start
+        // Reset to kinematic and reset position
+        body.setBodyType(2, true); // 2 = Kinematic Position Based
         const x = (i % GRID_SIZE) - 9.5;
         const z = Math.floor(i / GRID_SIZE) - 9.5;
         body.setTranslation({ x: x * 2, y: -0.5, z: z * 2 }, true);
