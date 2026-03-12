@@ -229,62 +229,66 @@ export const Shop = ({ isOpen, onClose }: ShopProps) => {
                           {category === 'skins' ? 'Skins Personaggio' : category === 'trails' ? 'Scie di Movimento' : 'Emote & Danze'}
                         </h3>
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                          {SHOP_ITEMS.filter(item => item.category === category).map((item) => {
-                            const isOwned = profile.inventory?.[category as keyof typeof profile.inventory]?.includes(item.id) || profile.unlocked_items?.includes(item.id);
-                            const canAfford = profile.coins >= item.price;
+                          {(() => {
+                            const filtered = SHOP_ITEMS.filter(item => item.category === category);
+                            console.log(`[DEBUG] Shop category ${category}:`, filtered.map(f => f.id));
+                            return filtered.map((item) => {
+                              const isOwned = profile.inventory?.[category as keyof typeof profile.inventory]?.includes(item.id) || profile.unlocked_items?.includes(item.id);
+                              const canAfford = profile.coins >= item.price;
 
-                            return (
-                              <div key={item.id} 
-                                   onClick={() => item.category === 'skins' && setSelectedSkinId(item.id)}
-                                   className={`bg-white border-[4px] rounded-[2rem] p-5 flex flex-col hover:border-amber-400 transition-all shadow-sm relative overflow-hidden cursor-pointer ${selectedSkinId === item.id ? 'border-amber-400 ring-4 ring-amber-100' : 'border-slate-100'}`}
-                              >
-                                <div className={`absolute top-0 right-0 px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-bl-xl ${
-                                    item.tier === 'Legendary' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
-                                    item.tier === 'Epic' ? 'bg-indigo-500 text-white' :
-                                    item.tier === 'Rare' ? 'bg-blue-500 text-white' :
-                                    'bg-slate-200 text-slate-500'
-                                  }`}
+                              return (
+                                <div key={item.id} 
+                                     onClick={() => item.category === 'skins' && setSelectedSkinId(item.id)}
+                                     className={`bg-white border-[4px] rounded-[2rem] p-5 flex flex-col hover:border-amber-400 transition-all shadow-sm relative overflow-hidden cursor-pointer ${selectedSkinId === item.id ? 'border-amber-400 ring-4 ring-amber-100' : 'border-slate-100'}`}
                                 >
-                                  {item.tier}
-                                </div>
-
-                                <div className="flex items-start gap-4 mb-4 mt-2">
-                                  <div className={`p-4 rounded-2xl ${isOwned ? 'bg-emerald-50 text-emerald-500 border-2 border-emerald-100' : 'bg-slate-50 text-slate-400 border-2 border-slate-100'}`}>
-                                    <span className="text-2xl">{item.icon}</span>
+                                  <div className={`absolute top-0 right-0 px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-bl-xl ${
+                                      item.tier === 'Legendary' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
+                                      item.tier === 'Epic' ? 'bg-indigo-500 text-white' :
+                                      item.tier === 'Rare' ? 'bg-blue-500 text-white' :
+                                      'bg-slate-200 text-slate-500'
+                                    }`}
+                                  >
+                                    {item.tier}
                                   </div>
-                                  <div className="text-left flex-1">
-                                    <h4 className="font-black text-slate-800 text-lg leading-tight mb-1">{item.name}</h4>
-                                    <p className="text-[11px] text-slate-400 font-bold leading-snug">{item.description}</p>
-                                  </div>
-                                </div>
 
-                                <button
-                                  disabled={isOwned || !canAfford}
-                                  onClick={async () => {
-                                    const success = await purchaseItem(item.id, item.price);
-                                    if (success) {
-                                      audio.playCoinSound?.();
-                                      if (item.id === 'skin_special_israel' || item.id === 'skin_robsbagliato') {
-                                        setHeroSkin({ isOpen: true, skinId: item.id });
+                                  <div className="flex items-start gap-4 mb-4 mt-2">
+                                    <div className={`p-4 rounded-2xl ${isOwned ? 'bg-emerald-50 text-emerald-500 border-2 border-emerald-100' : 'bg-slate-50 text-slate-400 border-2 border-slate-100'}`}>
+                                      <span className="text-2xl">{item.icon}</span>
+                                    </div>
+                                    <div className="text-left flex-1">
+                                      <h4 className="font-black text-slate-800 text-lg leading-tight mb-1">{item.name}</h4>
+                                      <p className="text-[11px] text-slate-400 font-bold leading-snug">{item.description}</p>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    disabled={isOwned || !canAfford}
+                                    onClick={async () => {
+                                      const success = await purchaseItem(item.id, item.price);
+                                      if (success) {
+                                        audio.playCoinSound?.();
+                                        if (item.id === 'skin_special_israel' || item.id === 'skin_robsbagliato') {
+                                          setHeroSkin({ isOpen: true, skinId: item.id });
+                                        }
+                                        if (item.category === 'skins') {
+                                          await equipSkin(item.id);
+                                        }
                                       }
-                                      if (item.category === 'skins') {
-                                        await equipSkin(item.id);
-                                      }
-                                    }
-                                  }}
-                                  className={`w-full py-3 rounded-2xl font-black text-sm uppercase transition-all shadow-sm border-[3px] border-b-[6px] active:border-b-[3px] active:translate-y-1 ${
-                                    isOwned
-                                      ? 'bg-emerald-100 text-emerald-600 border-emerald-300 cursor-default shadow-none translate-y-[3px] border-b-[3px]'
-                                      : canAfford
-                                        ? 'bg-indigo-500 text-white border-indigo-700 hover:bg-indigo-400'
-                                        : 'bg-slate-100 text-slate-400 border-slate-300 cursor-not-allowed opacity-70'
-                                  }`}
-                                >
-                                  {isOwned ? 'Sbloccato' : <span className="flex items-center justify-center gap-1.5"><Coins size={16}/> {item.price} PB</span>}
-                                </button>
-                              </div>
-                            );
-                          })}
+                                    }}
+                                    className={`w-full py-3 rounded-2xl font-black text-sm uppercase transition-all shadow-sm border-[3px] border-b-[6px] active:border-b-[3px] active:translate-y-1 ${
+                                      isOwned
+                                        ? 'bg-emerald-100 text-emerald-600 border-emerald-300 cursor-default shadow-none translate-y-[3px] border-b-[3px]'
+                                        : canAfford
+                                          ? 'bg-indigo-500 text-white border-indigo-700 hover:bg-indigo-400'
+                                          : 'bg-slate-100 text-slate-400 border-slate-300 cursor-not-allowed opacity-70'
+                                    }`}
+                                  >
+                                    {isOwned ? 'Sbloccato' : <span className="flex items-center justify-center gap-1.5"><Coins size={16}/> {item.price} PB</span>}
+                                  </button>
+                                </div>
+                              );
+                            });
+                          })()}
                         </div>
                       </div>
                     ))}
