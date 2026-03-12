@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment, Float, Stars, Text3D, Center } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Environment, Float, Stars, Text3D, Center, useGLTF, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import confetti from 'canvas-confetti';
 
@@ -94,7 +94,9 @@ export function SkinAcquisitionHero({ isOpen, onClose, skinId }: SkinAcquisition
 
             <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
               <group position={[0, -0.8, 0]}>
-                <HeroCharacter progress={progress} skinId={skinId} />
+                <Suspense fallback={null}>
+                  <HeroCharacter progress={progress} skinId={skinId} />
+                </Suspense>
               </group>
             </Float>
             

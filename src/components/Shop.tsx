@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Coins, Loader2, Star, Check } from 'lucide-react';
 import { useProfileStore, SHOP_ITEMS } from '../store/profile';
@@ -140,7 +140,9 @@ export const Shop = ({ isOpen, onClose }: ShopProps) => {
                              <ambientLight intensity={0.8} />
                              <pointLight position={[10, 10, 10]} intensity={1.5} />
                              <Environment preset="city" />
-                             <SkinPreview skinId={selectedSkinId} />
+                             <Suspense fallback={null}>
+                               <SkinPreview skinId={selectedSkinId} />
+                             </Suspense>
                              <OrbitControls enableZoom={false} enablePan={false} />
                            </Canvas>
                          </div>
