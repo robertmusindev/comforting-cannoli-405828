@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { Billboard, Text, useGLTF } from '@react-three/drei';
+import { Billboard, Text, useGLTF, useTexture } from '@react-three/drei';
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier';
 import { useRef, useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
@@ -38,6 +38,13 @@ export function Bot({ id, name }: { id: number; name: string }) {
   const torsoColor = useMemo(() => {
     const colors = ['#e74c3c', '#2ecc71', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c', '#e84393', '#00b894', '#fdcb6e', '#6c5ce7', '#ff7675'];
     return colors[id % colors.length];
+  }, [id]);
+
+  const botSkin = useMemo(() => {
+    const skins = ['default_skin', 'skin_solid', 'skin_pattern', 'skin_epic', 'skin_legendary'];
+    // Give some more weighted chance to default
+    if (Math.random() < 0.4) return 'default_skin';
+    return skins[id % skins.length];
   }, [id]);
 
   // Initial random position
@@ -93,17 +100,44 @@ export function Bot({ id, name }: { id: number; name: string }) {
   }, [gameState, targetColor, gridColors, id]);
 
   const { scene } = useGLTF(import.meta.env.BASE_URL + 'asset3d/character1.glb');
-  const clone = useMemo(() => scene.clone(), [scene]);
+  const textures = useTexture({
+    default: import.meta.env.BASE_URL + 'texture/zioperanza__DefaultMaterial_BaseColor.png',
+    israel: import.meta.env.BASE_URL + 'skins/israel_skin.png',
+    robsbagliato: import.meta.env.BASE_URL + 'texture/robsbagliato.png',
+  });
 
-  // Apply torso color to the model
-  useEffect(() => {
-    clone.traverse((node) => {
-      if (node instanceof THREE.Mesh && (node.name.toLowerCase().includes('body') || node.name.toLowerCase().includes('torso'))) {
-        node.material = node.material.clone();
-        node.material.color.set(torsoColor);
+  const clone = useMemo(() => {
+    const c = scene.clone();
+    c.traverse((node) => {
+      if (node instanceof THREE.Mesh) {
+        const mat = new THREE.MeshStandardMaterial();
+        node.material = mat;
+        
+        if (botSkin === 'skin_special_israel') {
+          mat.map = textures.israel;
+          textures.israel.flipY = false;
+        } else if (botSkin === 'skin_robsbagliato') {
+          mat.map = textures.robsbagliato;
+          textures.robsbagliato.flipY = false;
+        } else if (botSkin === 'skin_epic') {
+          mat.color.set('#ffd700');
+          mat.metalness = 0.8;
+          mat.roughness = 0.1;
+        } else if (botSkin === 'skin_solid') {
+          mat.color.set(torsoColor);
+        } else if (botSkin === 'skin_pattern') {
+          mat.color.set('#3a0ca3');
+        } else if (botSkin === 'skin_legendary') {
+          mat.color.set('#ffffff');
+        } else {
+          mat.map = textures.default;
+          textures.default.flipY = false;
+        }
+        mat.needsUpdate = true;
       }
     });
-  }, [clone, torsoColor]);
+    return c;
+  }, [scene, textures, botSkin, torsoColor]);
 
   useFrame((state, delta) => {
     if (!bodyRef.current) return;
@@ -224,7 +258,7 @@ export function Bot({ id, name }: { id: number; name: string }) {
 
     // Rotation
     if (_direction.lengthSq() > 0.1 && avatarRef.current) {
-      const targetAngle = Math.atan2(_direction.x, _direction.z);
+      const targetAngle = Math.atan2(_direction.x, _direction.z) + Math.PI;
       _targetQuaternion.setFromAxisAngle(_upVector, targetAngle);
       avatarRef.current.quaternion.slerp(_targetQuaternion, 1 - Math.exp(-15 * delta));
     }
@@ -241,6 +275,17 @@ export function Bot({ id, name }: { id: number; name: string }) {
         _scaleVector.set(1, 1, 1);
         avatarRef.current.scale.lerp(_scaleVector, 1 - Math.exp(-15 * delta));
       }
+    }
+
+    // Rainbow effect for Legendary Skin
+    if (botSkin === 'skin_legendary') {
+      const hue = (state.clock.elapsedTime * 0.5 + id * 0.1) % 1;
+      const rainbowColor = new THREE.Color().setHSL(hue, 0.8, 0.5);
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh) {
+          (node.material as THREE.MeshStandardMaterial).color.copy(rainbowColor);
+        }
+      });
     }
 
     // Walking animation - Mapping to GLB

@@ -6,6 +6,9 @@ import { useI18nStore } from '../store/i18n';
 import { audio } from '../utils/audio';
 import { PurchaseCelebration } from './PurchaseCelebration';
 import { SkinAcquisitionHero } from './SkinAcquisitionHero';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
+import { SkinPreview } from './SkinPreview';
 
 const PB_BUNDLES = [
   { id: 'b1', name: 'Handful of Blocks', pbAmount: 1000, priceUsd: 0.99, valueProp: 'Perfect for a quick skin!', image: import.meta.env.BASE_URL + 'bundles/bundle_handful.png' },
@@ -36,6 +39,8 @@ export const Shop = ({ isOpen, onClose }: ShopProps) => {
     isOpen: false,
     skinId: ''
   });
+
+  const [selectedSkinId, setSelectedSkinId] = useState<string | null>(null);
 
   const getUiScale = () => {
     if (typeof window === 'undefined') return 1;
@@ -110,6 +115,38 @@ export const Shop = ({ isOpen, onClose }: ShopProps) => {
                       <span className="font-black text-2xl text-white">{profile.coins.toLocaleString()} PB</span>
                     </div>
                   </div>
+
+                  {/* 3D Skin Preview Overlay */}
+                  <AnimatePresence>
+                    {selectedSkinId && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 50 }}
+                        className="fixed right-10 top-1/2 -translate-y-1/2 w-80 h-96 bg-white/80 backdrop-blur-xl rounded-[3rem] border-[6px] border-amber-400 shadow-2xl z-50 overflow-hidden hidden xl:block"
+                      >
+                         <div className="absolute top-4 left-0 right-0 text-center z-10">
+                            <h4 className="font-black text-slate-800 uppercase tracking-widest text-sm">Preview 3D</h4>
+                            <p className="text-[10px] font-bold text-slate-400">Trascina per ruotare</p>
+                         </div>
+                         <button 
+                           onClick={() => setSelectedSkinId(null)}
+                           className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 z-20"
+                         >
+                           <X size={20} />
+                         </button>
+                         <div className="w-full h-full">
+                           <Canvas shadows camera={{ position: [0, 1.5, 4], fov: 40 }}>
+                             <ambientLight intensity={0.8} />
+                             <pointLight position={[10, 10, 10]} intensity={1.5} />
+                             <Environment preset="city" />
+                             <SkinPreview skinId={selectedSkinId} />
+                             <OrbitControls enableZoom={false} enablePan={false} />
+                           </Canvas>
+                         </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   <div className="mb-12">
                     <h3 className="font-black text-slate-800 text-2xl uppercase tracking-widest mb-6 flex items-center gap-3 border-b-[4px] border-slate-200 pb-4">
@@ -195,7 +232,10 @@ export const Shop = ({ isOpen, onClose }: ShopProps) => {
                             const canAfford = profile.coins >= item.price;
 
                             return (
-                              <div key={item.id} className="bg-white border-[4px] border-slate-100 rounded-[2rem] p-5 flex flex-col hover:border-indigo-100 transition-colors shadow-sm relative overflow-hidden">
+                              <div key={item.id} 
+                                   onClick={() => item.category === 'skins' && setSelectedSkinId(item.id)}
+                                   className={`bg-white border-[4px] rounded-[2rem] p-5 flex flex-col hover:border-amber-400 transition-all shadow-sm relative overflow-hidden cursor-pointer ${selectedSkinId === item.id ? 'border-amber-400 ring-4 ring-amber-100' : 'border-slate-100'}`}
+                              >
                                 <div className={`absolute top-0 right-0 px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-bl-xl ${
                                     item.tier === 'Legendary' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
                                     item.tier === 'Epic' ? 'bg-indigo-500 text-white' :
@@ -222,7 +262,7 @@ export const Shop = ({ isOpen, onClose }: ShopProps) => {
                                     const success = await purchaseItem(item.id, item.price);
                                     if (success) {
                                       audio.playCoinSound?.();
-                                      if (item.id === 'skin_special_israel') {
+                                      if (item.id === 'skin_special_israel' || item.id === 'skin_robsbagliato') {
                                         setHeroSkin({ isOpen: true, skinId: item.id });
                                       }
                                       if (item.category === 'skins') {

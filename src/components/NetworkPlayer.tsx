@@ -1,6 +1,6 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Billboard, Text, useGLTF } from '@react-three/drei';
+import { Billboard, Text, useGLTF, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface NetworkPlayerProps {
@@ -9,9 +9,10 @@ interface NetworkPlayerProps {
   position: [number, number, number];
   rotation?: [number, number, number];
   isEliminated?: boolean;
+  skinId?: string;
 }
 
-export function NetworkPlayer({ id, name, position, rotation, isEliminated }: NetworkPlayerProps) {
+export function NetworkPlayer({ id, name, position, rotation, isEliminated, skinId }: NetworkPlayerProps) {
   const group = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
   const rightArmRef = useRef<THREE.Mesh>(null);
@@ -42,7 +43,46 @@ export function NetworkPlayer({ id, name, position, rotation, isEliminated }: Ne
   }, [position]);
 
   const { scene } = useGLTF(import.meta.env.BASE_URL + 'asset3d/character1.glb');
-  const clone = useMemo(() => scene.clone(), [scene]);
+  const textures = useTexture({
+    default: import.meta.env.BASE_URL + 'texture/zioperanza__DefaultMaterial_BaseColor.png',
+    israel: import.meta.env.BASE_URL + 'skins/israel_skin.png',
+    robsbagliato: import.meta.env.BASE_URL + 'texture/robsbagliato.png',
+  });
+
+  const [currentSkin, setCurrentSkin] = (useState as any)(skinId || 'default_skin');
+
+  const clone = useMemo(() => {
+    const c = scene.clone();
+    c.traverse((node) => {
+      if (node instanceof THREE.Mesh) {
+        const mat = new THREE.MeshStandardMaterial();
+        node.material = mat;
+        
+        if (currentSkin === 'skin_special_israel') {
+          mat.map = textures.israel;
+          textures.israel.flipY = false;
+        } else if (currentSkin === 'skin_robsbagliato') {
+          mat.map = textures.robsbagliato;
+          textures.robsbagliato.flipY = false;
+        } else if (currentSkin === 'skin_epic') {
+          mat.color.set('#ffd700');
+          mat.metalness = 0.8;
+          mat.roughness = 0.1;
+        } else if (currentSkin === 'skin_solid') {
+          mat.color.set('#4cc9f0');
+        } else if (currentSkin === 'skin_pattern') {
+          mat.color.set('#3a0ca3');
+        } else if (currentSkin === 'skin_legendary') {
+          mat.color.set('#ffffff');
+        } else {
+          mat.map = textures.default;
+          textures.default.flipY = false;
+        }
+        mat.needsUpdate = true;
+      }
+    });
+    return c;
+  }, [scene, textures, currentSkin]);
 
   useFrame((state, delta) => {
     if (!group.current) return;
@@ -64,9 +104,24 @@ export function NetworkPlayer({ id, name, position, rotation, isEliminated }: Ne
       const b = buffer[id];
       targetPosition.current.set(b.position[0], b.position[1], b.position[2]);
       
+      if (b.skinId && b.skinId !== currentSkin) {
+        setCurrentSkin(b.skinId);
+      }
+
       const euler = new THREE.Euler(b.rotation[0], b.rotation[1], b.rotation[2], 'XYZ');
       const targetQuat = new THREE.Quaternion().setFromEuler(euler);
       group.current.quaternion.slerp(targetQuat, 1 - Math.exp(-15 * delta));
+    }
+
+    // Rainbow effect for Legendary Skin
+    if (currentSkin === 'skin_legendary') {
+      const hue = (state.clock.elapsedTime * 0.5) % 1;
+      const rainbowColor = new THREE.Color().setHSL(hue, 0.8, 0.5);
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh) {
+          (node.material as THREE.MeshStandardMaterial).color.copy(rainbowColor);
+        }
+      });
     }
 
     const lerpFactor = 1 - Math.exp(-12 * delta);

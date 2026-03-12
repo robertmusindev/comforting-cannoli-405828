@@ -1,5 +1,5 @@
-import { useFrame, useLoader } from '@react-three/fiber';
-import { Billboard, Text, useGLTF } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { Billboard, Text, useGLTF, useTexture } from '@react-three/drei';
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier';
 import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
@@ -45,8 +45,6 @@ export function Player() {
   const broadcastMovement = useMultiplayerStore(state => state.broadcastMovement);
   const equippedSkin = useProfileStore(state => state.profile?.equipped_skin || 'default_skin');
 
-  const israelTexture = useLoader(THREE.TextureLoader, import.meta.env.BASE_URL + 'skins/israel_skin.png');
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent scrolling with spacebar
@@ -80,7 +78,44 @@ export function Player() {
   }, []);
 
   const { scene } = useGLTF(import.meta.env.BASE_URL + 'asset3d/character1.glb');
-  const clone = useMemo(() => scene.clone(), [scene]);
+  const textures = useTexture({
+    default: import.meta.env.BASE_URL + 'texture/zioperanza__DefaultMaterial_BaseColor.png',
+    israel: import.meta.env.BASE_URL + 'skins/israel_skin.png',
+    robsbagliato: import.meta.env.BASE_URL + 'texture/robsbagliato.png',
+  });
+  
+  const clone = useMemo(() => {
+    const c = scene.clone();
+    c.traverse((node) => {
+      if (node instanceof THREE.Mesh) {
+        const mat = new THREE.MeshStandardMaterial();
+        node.material = mat;
+        
+        if (equippedSkin === 'skin_special_israel') {
+          mat.map = textures.israel;
+          textures.israel.flipY = false;
+        } else if (equippedSkin === 'skin_robsbagliato') {
+          mat.map = textures.robsbagliato;
+          textures.robsbagliato.flipY = false;
+        } else if (equippedSkin === 'skin_epic') {
+          mat.color.set('#ffd700');
+          mat.metalness = 0.8;
+          mat.roughness = 0.1;
+        } else if (equippedSkin === 'skin_solid') {
+          mat.color.set('#4cc9f0');
+        } else if (equippedSkin === 'skin_pattern') {
+          mat.color.set('#3a0ca3');
+        } else if (equippedSkin === 'skin_legendary') {
+          mat.color.set('#ffffff');
+        } else {
+          mat.map = textures.default;
+          textures.default.flipY = false;
+        }
+        mat.needsUpdate = true;
+      }
+    });
+    return c;
+  }, [scene, textures, equippedSkin]);
 
   useFrame((state, delta) => {
     if (!bodyRef.current) return;
@@ -93,7 +128,7 @@ export function Player() {
       networkSyncTimer.current += delta;
       if (networkSyncTimer.current > 0.066) {
          const avatarRot = avatarRef.current.rotation;
-         broadcastMovement([pos.x, pos.y, pos.z], [avatarRot.x, avatarRot.y, avatarRot.z]);
+         broadcastMovement([pos.x, pos.y, pos.z], [avatarRot.x, avatarRot.y, avatarRot.z], equippedSkin);
          networkSyncTimer.current = 0;
       }
     }
@@ -125,7 +160,7 @@ export function Player() {
 
     // Avatar rotation - tightly coupled to INPUT direction for responsiveness
     if (_direction.lengthSq() > 0.1 && avatarRef.current) {
-      const targetAngle = Math.atan2(_direction.x, _direction.z);
+      const targetAngle = Math.atan2(_direction.x, _direction.z) + Math.PI;
       _targetQuaternion.setFromAxisAngle(_upVector, targetAngle);
       avatarRef.current.quaternion.slerp(_targetQuaternion, 1 - Math.exp(-15 * delta));
     }
@@ -145,6 +180,17 @@ export function Player() {
         _scaleVector.set(1, 1, 1);
         avatarRef.current.scale.lerp(_scaleVector, 1 - Math.exp(-15 * delta));
       }
+    }
+
+    // Rainbow effect for Legendary Skin
+    if (equippedSkin === 'skin_legendary') {
+      const hue = (state.clock.elapsedTime * 0.5) % 1;
+      const rainbowColor = new THREE.Color().setHSL(hue, 0.8, 0.5);
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh) {
+          (node.material as THREE.MeshStandardMaterial).color.copy(rainbowColor);
+        }
+      });
     }
 
     // Procedural Walking Animation - Mapping to GLB structure if possible

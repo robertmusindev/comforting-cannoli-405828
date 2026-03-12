@@ -101,6 +101,7 @@ export function Game() {
                 position={p.position || [0, 5, 0]} 
                 rotation={p.rotation}
                 isEliminated={p.isEliminated} 
+                skinId={p.skinId}
               />
             ))}
 

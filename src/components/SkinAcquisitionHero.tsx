@@ -71,14 +71,14 @@ export function SkinAcquisitionHero({ isOpen, onClose, skinId }: SkinAcquisition
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000] bg-slate-950/95 backdrop-blur-2xl flex flex-col items-center justify-center overflow-hidden"
+        className="fixed inset-0 z-[10000] bg-white/95 backdrop-blur-3xl flex flex-col items-center justify-center overflow-hidden"
       >
         {/* Animated Background Rays */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div 
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-[100%] bg-[conic-gradient(from_0deg,#3498db_0%,transparent_10%,#ffffff_20%,transparent_30%,#3498db_40%,transparent_50%,#ffffff_60%,transparent_70%,#3498db_80%,transparent_90%)] opacity-20"
+            className={`absolute -inset-[100%] opacity-40 ${skinId === 'skin_special_israel' ? 'bg-[conic-gradient(from_0deg,#3498db_0%,transparent_10%,#ffffff_20%,transparent_30%,#3498db_40%,transparent_50%,#ffffff_60%,transparent_70%,#3498db_80%,transparent_90%)]' : 'bg-[conic-gradient(from_0deg,#fbbf24_0%,transparent_10%,#ffffff_20%,transparent_30%,#fbbf24_40%,transparent_50%,#ffffff_60%,transparent_70%,#fbbf24_80%,transparent_90%)]'}`}
           />
         </div>
 
@@ -86,15 +86,15 @@ export function SkinAcquisitionHero({ isOpen, onClose, skinId }: SkinAcquisition
         <div className="w-full h-[60vh] relative z-20">
           <Canvas gl={{ antialias: true }} dpr={[1, 2]}>
             <PerspectiveCamera makeDefault position={[0, 1, 5]} />
-            <ambientLight intensity={0.8} />
-            <pointLight position={[10, 10, 10]} intensity={1.5} />
-            <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={2} />
+            <ambientLight intensity={1} />
+            <pointLight position={[10, 10, 10]} intensity={2} />
+            <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={3} />
             <Environment preset="city" />
             <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
             <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-              <group position={[0, -0.5, 0]}>
-                <HeroCharacter progress={progress} />
+              <group position={[0, -0.8, 0]}>
+                <HeroCharacter progress={progress} skinId={skinId} />
               </group>
             </Float>
             
@@ -116,8 +116,8 @@ export function SkinAcquisitionHero({ isOpen, onClose, skinId }: SkinAcquisition
                 transition={{ type: "spring", damping: 5, stiffness: 200 }}
                 className="mb-8"
               >
-                <h1 className="text-5xl md:text-8xl font-black text-white drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] uppercase italic tracking-tighter" style={{ WebkitTextStroke: '2px #3498db' }}>
-                   UNITED STATES OF ISRAEL
+                <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter drop-shadow-2xl uppercase" style={{ WebkitTextStroke: skinId === 'skin_special_israel' ? '2px #3498db' : '2px #f59e0b', color: skinId === 'skin_special_israel' ? '#ffffff' : '#1e293b' }}>
+                   {skinId === 'skin_special_israel' ? 'UNITED STATES OF ISRAEL' : 'ROB SBAGLIATO!!'}
                 </h1>
               </motion.div>
             )}
@@ -131,7 +131,7 @@ export function SkinAcquisitionHero({ isOpen, onClose, skinId }: SkinAcquisition
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onClose}
-            className="bg-white text-slate-900 px-12 py-5 rounded-2xl font-black text-xl uppercase tracking-widest shadow-[0_10px_20px_rgba(255,255,255,0.1)] hover:bg-[#3498db] hover:text-white transition-colors border-b-8 border-slate-200 active:border-b-0"
+            className="bg-amber-500 text-white px-12 py-5 rounded-2xl font-black text-xl uppercase tracking-widest shadow-xl hover:bg-amber-400 transition-colors border-b-8 border-amber-700 active:border-b-0"
           >
             Continua
           </motion.button>

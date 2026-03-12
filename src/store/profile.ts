@@ -38,6 +38,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'skin_epic', name: 'Oro Massiccio', description: 'Skin Epica brillante', price: 5000, icon: '🏆', category: 'skins', tier: 'Epic' },
   { id: 'skin_legendary', name: 'Arcobaleno', description: 'Skin leggendaria che cambia color', price: 15000, icon: '🌈', category: 'skins', tier: 'Legendary' },
   { id: 'skin_special_israel', name: 'Israel Hero', description: 'Special Hero Skin - United States of Israel', price: 0, icon: '🇮🇱', category: 'skins', tier: 'Legendary' },
+  { id: 'skin_robsbagliato', name: 'Rob Sbagliato', description: 'La skin definitiva di Rob', price: 20000, icon: '🤵', category: 'skins', tier: 'Legendary' },
   
   // Trails
   { id: 'trail_dust', name: 'Scia Polvere', description: 'Classica scia di polvere', price: 800, icon: '💨', category: 'trails', tier: 'Basic' },

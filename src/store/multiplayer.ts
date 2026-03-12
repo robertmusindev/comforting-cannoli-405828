@@ -10,6 +10,7 @@ export interface NetworkPlayer {
   position?: [number, number, number];
   rotation?: [number, number, number];
   isEliminated?: boolean;
+  skinId?: string;
 }
 
 interface MultiplayerState {
@@ -24,7 +25,7 @@ interface MultiplayerState {
   createLobby: (hostName: string, hostAuthId?: string) => Promise<void>;
   joinLobby: (lobbyId: string, playerName: string, authId?: string) => Promise<void>;
   leaveLobby: () => Promise<void>;
-  broadcastMovement: (position: [number, number, number], rotation: [number, number, number]) => void;
+  broadcastMovement: (position: [number, number, number], rotation: [number, number, number], skinId: string) => void;
   broadcastElimination: () => void;
 }
 
@@ -117,11 +118,11 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
           set({ players: uniquePlayers });
         })
         .on('broadcast', { event: 'movement' }, (payload) => {
-           const { playerId, position, rotation } = payload.payload;
+           const { playerId, position, rotation, skinId } = payload.payload;
            // Optimized: Store in a global non-reactive buffer instead of React state
            if (typeof window !== 'undefined') {
              (window as any).remotePlayerBuffer = (window as any).remotePlayerBuffer || {};
-             (window as any).remotePlayerBuffer[playerId] = { position, rotation, timestamp: Date.now() };
+             (window as any).remotePlayerBuffer[playerId] = { position, rotation, skinId, timestamp: Date.now() };
            }
         })
         .subscribe(async (status) => {
@@ -131,7 +132,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
                 id: playerData.id,
                 name: hostName,
                 isHost: true,
-                isEliminated: false
+                isEliminated: false,
+                skinId: (await import('./profile')).useProfileStore.getState().profile?.equipped_skin || 'default_skin'
               }
             });
             set({ 
@@ -214,10 +216,10 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
            useGameStore.getState().networkEliminatePlayer(payload.payload.playerId);
         })
         .on('broadcast', { event: 'movement' }, (payload) => {
-           const { playerId, position, rotation } = payload.payload;
+           const { playerId, position, rotation, skinId } = payload.payload;
            if (typeof window !== 'undefined') {
              (window as any).remotePlayerBuffer = (window as any).remotePlayerBuffer || {};
-             (window as any).remotePlayerBuffer[playerId] = { position, rotation, timestamp: Date.now() };
+             (window as any).remotePlayerBuffer[playerId] = { position, rotation, skinId, timestamp: Date.now() };
            }
         })
         .subscribe(async (status) => {
@@ -227,7 +229,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
                 id: playerData.id,
                 name: playerName,
                 isHost: false,
-                isEliminated: false
+                isEliminated: false,
+                skinId: (await import('./profile')).useProfileStore.getState().profile?.equipped_skin || 'default_skin'
               }
             });
             set({ 
@@ -267,7 +270,7 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     set({ channel: null, lobbyId: null, isHost: false, players: [], myPlayerId: null });
   },
 
-  broadcastMovement: (position: [number, number, number], rotation: [number, number, number]) => {
+  broadcastMovement: (position: [number, number, number], rotation: [number, number, number], skinId: string) => {
      const { channel, myPlayerId } = get();
      if (!channel || !myPlayerId) return;
      
@@ -277,7 +280,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
        payload: {
          playerId: myPlayerId,
          position,
-         rotation
+         rotation,
+         skinId
        }
      }).catch(e => console.error("Rate limit or send error:", e));
   },
