@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment, Float, Stars, Text3D, Center, useGLTF, useTexture } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Environment, Float, Stars, useGLTF, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import confetti from 'canvas-confetti';
 
@@ -143,52 +143,40 @@ export function SkinAcquisitionHero({ isOpen, onClose, skinId }: SkinAcquisition
   );
 }
 
-function HeroCharacter({ progress }: { progress: number }) {
-  const meshRef = React.useRef<THREE.Group>(null);
-  
-  // Create textures if needed, or just colors for mock
-  // In a real app, load the flag texture
-  const texture = React.useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    return loader.load(import.meta.env.BASE_URL + 'skins/israel_skin.png');
-  }, []);
+function HeroCharacter({ progress, skinId }: { progress: number, skinId: string }) {
+  const { scene } = useGLTF(import.meta.env.BASE_URL + 'asset3d/character1.glb');
+  const textures = useTexture({
+    default: import.meta.env.BASE_URL + 'texture/zioperanza__DefaultMaterial_BaseColor.png',
+    israel: import.meta.env.BASE_URL + 'skins/israel_skin.png',
+    robsbagliato: import.meta.env.BASE_URL + 'texture/robsbagliato.png',
+  });
 
-  return (
-    <group ref={meshRef}>
-      {/* Head */}
-      <mesh position={[0, 1.5, 0]}>
-        <boxGeometry args={[0.8, 0.8, 0.8]} />
-        <meshStandardMaterial color={progress > 0.5 ? '#ffffff' : '#FFD1A4'} />
-      </mesh>
-      
-      {/* Torso - This is where the flag goes */}
-      <mesh position={[0, 0.6, 0]}>
-        <boxGeometry args={[1, 1, 0.52]} />
-        <meshStandardMaterial 
-          map={progress > 0.8 ? texture : null} 
-          color={progress > 0.8 ? '#ffffff' : THREE.MathUtils.lerp(0x3498db, 0xffffff, Math.min(1, progress * 1.2))}
-        />
-      </mesh>
+  const clone = useMemo(() => {
+    if (!scene) return new THREE.Group();
+    const c = scene.clone();
+    c.traverse((node) => {
+      if (node instanceof THREE.Mesh) {
+        const mat = new THREE.MeshStandardMaterial();
+        node.material = mat;
+        
+        if (progress > 0.8) {
+          if (skinId === 'skin_special_israel') {
+             mat.map = textures.israel;
+             textures.israel.flipY = false;
+          } else if (skinId === 'skin_robsbagliato') {
+             mat.map = textures.robsbagliato;
+             textures.robsbagliato.flipY = false;
+          }
+        } else {
+             const startColor = new THREE.Color(0x3498db);
+             const endColor = new THREE.Color(0xffffff);
+             mat.color.copy(startColor).lerp(endColor, progress);
+        }
+        mat.needsUpdate = true;
+      }
+    });
+    return c;
+  }, [scene, textures, skinId, progress]);
 
-      {/* Arms */}
-      <mesh position={[-0.7, 0.6, 0]}>
-        <boxGeometry args={[0.35, 1, 0.35]} />
-        <meshStandardMaterial color={progress > 0.6 ? '#3498db' : '#FFD1A4'} />
-      </mesh>
-      <mesh position={[0.7, 0.6, 0]}>
-        <boxGeometry args={[0.35, 1, 0.35]} />
-        <meshStandardMaterial color={progress > 0.6 ? '#3498db' : '#FFD1A4'} />
-      </mesh>
-
-      {/* Legs */}
-      <mesh position={[-0.25, -0.3, 0]}>
-        <boxGeometry args={[0.4, 0.8, 0.4]} />
-        <meshStandardMaterial color={progress > 0.4 ? '#ffffff' : '#2c3e50'} />
-      </mesh>
-      <mesh position={[0.25, -0.3, 0]}>
-        <boxGeometry args={[0.4, 0.8, 0.4]} />
-        <meshStandardMaterial color={progress > 0.4 ? '#ffffff' : '#2c3e50'} />
-      </mesh>
-    </group>
-  );
+  return <primitive object={clone} />;
 }
