@@ -1,7 +1,7 @@
 import { useFrame, useLoader } from '@react-three/fiber';
-import { Billboard, Text } from '@react-three/drei';
+import { Billboard, Text, useGLTF } from '@react-three/drei';
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useGameStore } from '../store';
 import { useProfileStore } from '../store/profile';
@@ -79,6 +79,9 @@ export function Player() {
     };
   }, []);
 
+  const { scene } = useGLTF(import.meta.env.BASE_URL + 'asset3d/character1.glb');
+  const clone = useMemo(() => scene.clone(), [scene]);
+
   useFrame((state, delta) => {
     if (!bodyRef.current) return;
 
@@ -144,24 +147,34 @@ export function Player() {
       }
     }
 
-    // Procedural Walking Animation
+    // Procedural Walking Animation - Mapping to GLB structure if possible
+    // Note: We search for nodes that match common names or just apply to specific parts if found
     const speed = _currentVelocity.length();
     if (isGrounded && speed > 0.5) {
-      // 60fps smooth procedural walk cycle
-      walkTime.current += delta * speed * 1.5; // Walk frequency scales with speed
-      const armSwing = Math.sin(walkTime.current) * 0.5;
+      walkTime.current += delta * speed * 1.5;
       const legSwing = Math.sin(walkTime.current) * 0.6;
-      
-      if (leftArmRef.current) leftArmRef.current.rotation.x = armSwing;
-      if (rightArmRef.current) rightArmRef.current.rotation.x = -armSwing;
-      if (leftLegRef.current) leftLegRef.current.rotation.x = -legSwing;
-      if (rightLegRef.current) rightLegRef.current.rotation.x = legSwing;
+      const armSwing = Math.sin(walkTime.current) * 0.5;
+
+      // Basic procedural animation for unknown GLB nodes by searching
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh || node instanceof THREE.Group) {
+          if (node.name.toLowerCase().includes('leg') || node.name.toLowerCase().includes('foot')) {
+            node.rotation.x = node.name.toLowerCase().includes('left') ? -legSwing : legSwing;
+          }
+          if (node.name.toLowerCase().includes('arm') || node.name.toLowerCase().includes('hand')) {
+            node.rotation.x = node.name.toLowerCase().includes('left') ? armSwing : -armSwing;
+          }
+        }
+      });
     } else {
-      // Smoothly return limbs to resting position (idle / jumping)
-      if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-      if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-      if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-      if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh || node instanceof THREE.Group) {
+          if (node.name.toLowerCase().includes('leg') || node.name.toLowerCase().includes('arm') || 
+              node.name.toLowerCase().includes('foot') || node.name.toLowerCase().includes('hand')) {
+            node.rotation.x = THREE.MathUtils.lerp(node.rotation.x, 0, 1 - Math.exp(-15 * delta));
+          }
+        }
+      });
       walkTime.current = 0;
     }
 
@@ -217,64 +230,9 @@ export function Player() {
   return (
     <RigidBody ref={bodyRef} ccd={true} colliders={false} position={[1, 5, 1]} enabledRotations={[false, false, false]}>
       <CapsuleCollider args={[0.5, 0.5]} friction={0} />
-      {/* Blocky Avatar */}
-      <group ref={avatarRef} position={[0, -0.5, 0]}>
-        {/* Head */}
-        <group position={[0, 1.5, 0]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.8, 0.8, 0.8]} />
-            <meshStandardMaterial color="#FFD1A4" flatShading />
-          </mesh>
-          {/* Eyes */}
-          <mesh position={[-0.2, 0.1, 0.41]}>
-            <boxGeometry args={[0.1, 0.1, 0.05]} />
-            <meshStandardMaterial color="#000" flatShading />
-          </mesh>
-          <mesh position={[0.2, 0.1, 0.41]}>
-            <boxGeometry args={[0.1, 0.1, 0.05]} />
-            <meshStandardMaterial color="#000" flatShading />
-          </mesh>
-          {/* Mouth */}
-          <mesh position={[0, -0.2, 0.41]}>
-            <boxGeometry args={[0.3, 0.1, 0.05]} />
-            <meshStandardMaterial color="#000" flatShading />
-          </mesh>
-        </group>
-        {/* Torso */}
-        <mesh position={[0, 0.6, 0]} castShadow>
-          <boxGeometry args={[1, 1, 0.5]} />
-          {equippedSkin === 'skin_special_israel' ? (
-            <meshStandardMaterial map={israelTexture} color="#ffffff" />
-          ) : (
-            <meshStandardMaterial color="#3498db" flatShading />
-          )}
-        </mesh>
-        {/* Arms - Pivot from shoulder */}
-        <group position={[-0.7, 0.9, 0]}>
-          <mesh ref={leftArmRef} position={[0, -0.3, 0]} castShadow>
-            <boxGeometry args={[0.3, 1, 0.3]} />
-            <meshStandardMaterial color="#FFD1A4" flatShading />
-          </mesh>
-        </group>
-        <group position={[0.7, 0.9, 0]}>
-          <mesh ref={rightArmRef} position={[0, -0.3, 0]} castShadow>
-            <boxGeometry args={[0.3, 1, 0.3]} />
-            <meshStandardMaterial color="#FFD1A4" flatShading />
-          </mesh>
-        </group>
-        {/* Legs - Pivot from hip */}
-        <group position={[-0.25, 0.1, 0]}>
-          <mesh ref={leftLegRef} position={[0, -0.3, 0]} castShadow>
-            <boxGeometry args={[0.4, 0.6, 0.4]} />
-            <meshStandardMaterial color="#2c3e50" flatShading />
-          </mesh>
-        </group>
-        <group position={[0.25, 0.1, 0]}>
-          <mesh ref={rightLegRef} position={[0, -0.3, 0]} castShadow>
-            <boxGeometry args={[0.4, 0.6, 0.4]} />
-            <meshStandardMaterial color="#2c3e50" flatShading />
-          </mesh>
-        </group>
+      {/* 3D Model Avatar */}
+      <group ref={avatarRef} position={[0, -0.9, 0]}>
+        <primitive object={clone} />
       </group>
       {/* Name Tag */}
       <Billboard position={[0, 2.8, 0]}>

@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Box, Billboard, Text } from '@react-three/drei';
+import { Billboard, Text, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface NetworkPlayerProps {
@@ -11,7 +11,7 @@ interface NetworkPlayerProps {
   isEliminated?: boolean;
 }
 
-export function NetworkPlayer({ name, position, rotation, isEliminated }: NetworkPlayerProps) {
+export function NetworkPlayer({ id, name, position, rotation, isEliminated }: NetworkPlayerProps) {
   const group = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
   const rightArmRef = useRef<THREE.Mesh>(null);
@@ -40,6 +40,9 @@ export function NetworkPlayer({ name, position, rotation, isEliminated }: Networ
       }
     }
   }, [position]);
+
+  const { scene } = useGLTF(import.meta.env.BASE_URL + 'asset3d/character1.glb');
+  const clone = useMemo(() => scene.clone(), [scene]);
 
   useFrame((state, delta) => {
     if (!group.current) return;
@@ -73,18 +76,28 @@ export function NetworkPlayer({ name, position, rotation, isEliminated }: Networ
     const distanceMoved = previousPos.distanceTo(group.current.position);
     if (distanceMoved > 0.05) {
       walkTime.current += delta * (distanceMoved / delta) * 0.5;
-      const armSwing = Math.sin(walkTime.current) * 0.5;
       const legSwing = Math.sin(walkTime.current) * 0.6;
+      const armSwing = Math.sin(walkTime.current) * 0.5;
       
-      if (leftArmRef.current) leftArmRef.current.rotation.x = armSwing;
-      if (rightArmRef.current) rightArmRef.current.rotation.x = -armSwing;
-      if (leftLegRef.current) leftLegRef.current.rotation.x = -legSwing;
-      if (rightLegRef.current) rightLegRef.current.rotation.x = legSwing;
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh || node instanceof THREE.Group) {
+          if (node.name.toLowerCase().includes('leg') || node.name.toLowerCase().includes('foot')) {
+            node.rotation.x = node.name.toLowerCase().includes('left') ? -legSwing : legSwing;
+          }
+          if (node.name.toLowerCase().includes('arm') || node.name.toLowerCase().includes('hand')) {
+            node.rotation.x = node.name.toLowerCase().includes('left') ? armSwing : -armSwing;
+          }
+        }
+      });
     } else {
-      if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-      if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-      if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
-      if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0, 1 - Math.exp(-15 * delta));
+      clone.traverse((node) => {
+        if (node instanceof THREE.Mesh || node instanceof THREE.Group) {
+          if (node.name.toLowerCase().includes('leg') || node.name.toLowerCase().includes('arm') || 
+              node.name.toLowerCase().includes('foot') || node.name.toLowerCase().includes('hand')) {
+            node.rotation.x = THREE.MathUtils.lerp(node.rotation.x, 0, 1 - Math.exp(-15 * delta));
+          }
+        }
+      });
       walkTime.current = 0;
     }
   });
@@ -100,38 +113,9 @@ export function NetworkPlayer({ name, position, rotation, isEliminated }: Networ
         </Billboard>
       )}
 
-      {/* Basic Roblox-style geometric avatar representation for Network Players */}
-      <group position={[0, -0.5, 0]}>
-        {/* Head */}
-        <Box args={[0.6, 0.6, 0.6]} position={[0, 1.5, 0]} castShadow>
-          <meshStandardMaterial color="#FFD1BA" />
-        </Box>
-        {/* Torso */}
-        <Box args={[0.8, 0.8, 0.4]} position={[0, 0.6, 0]} castShadow>
-          <meshStandardMaterial color="#3B82F6" /> {/* Blue shirt */}
-        </Box>
-        {/* Arms - Pivot from shoulder */}
-        <group position={[-0.7, 0.9, 0]}>
-          <Box ref={leftArmRef} args={[0.3, 1, 0.3]} position={[0, -0.3, 0]} castShadow>
-            <meshStandardMaterial color="#FFD1BA" />
-          </Box>
-        </group>
-        <group position={[0.7, 0.9, 0]}>
-          <Box ref={rightArmRef} args={[0.3, 1, 0.3]} position={[0, -0.3, 0]} castShadow>
-            <meshStandardMaterial color="#FFD1BA" />
-          </Box>
-        </group>
-        {/* Legs - Pivot from hip */}
-        <group position={[-0.25, 0.1, 0]}>
-          <Box ref={leftLegRef} args={[0.4, 0.6, 0.4]} position={[0, -0.3, 0]} castShadow>
-            <meshStandardMaterial color="#1E3A8A" />
-          </Box>
-        </group>
-        <group position={[0.25, 0.1, 0]}>
-          <Box ref={rightLegRef} args={[0.4, 0.6, 0.4]} position={[0, -0.3, 0]} castShadow>
-            <meshStandardMaterial color="#1E3A8A" />
-          </Box>
-        </group>
+      {/* 3D Model Avatar for Network Players */}
+      <group position={[0, -0.9, 0]}>
+        <primitive object={clone} />
       </group>
     </group>
   );
