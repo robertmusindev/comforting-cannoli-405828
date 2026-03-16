@@ -155,12 +155,24 @@ export function Hero() {
       <div className="relative z-10 w-full px-[clamp(1.5rem,4vw,6rem)] flex flex-col items-center justify-center text-center">
         {/* Mobile-only heading */}
         <div className="md:hidden text-center mb-[clamp(0.75rem,2vw,1.25rem)]">
-          <div className="text-[clamp(2.2rem,7vw,3.5rem)] font-medium tracking-tighter leading-tight text-zinc-900">
+          <motion.div
+            initial={{ opacity: 0, y: 32, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            style={{ willChange: "transform, opacity, filter" }}
+            className="text-[clamp(2.2rem,7vw,3.5rem)] font-medium tracking-tighter leading-tight text-zinc-900"
+          >
             Robert Musin
-          </div>
-          <div className="text-[clamp(1.4rem,4.5vw,2.2rem)] font-medium tracking-tight leading-tight mt-1">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.75 }}
+            style={{ willChange: "transform, opacity, filter" }}
+            className="text-[clamp(1.4rem,4.5vw,2.2rem)] font-medium tracking-tight leading-tight mt-2"
+          >
             <span className="bg-zinc-100 text-zinc-700 px-3 py-1 rounded-md">Full Stack Developer</span>
-          </div>
+          </motion.div>
         </div>
 
         {/* Desktop animated h1 */}
