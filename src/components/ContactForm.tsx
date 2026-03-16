@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useVelocity, useAnimationFrame } from "motion/react";
 
+import { ParallaxHeader } from "./ParallaxHeader";
 import { Loader2, CheckCircle2, AlertCircle, ArrowRight, Send } from "lucide-react";
 
 const contactSchema = z.object({
@@ -25,53 +26,6 @@ const services = [
   "Altro"
 ];
 
-// Utility for wrapping numbers
-const wrap = (min: number, max: number, v: number) => {
-  const rangeSize = max - min;
-  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
-};
-
-function ParallaxText({ children, baseVelocity = 100 }: { children: string; baseVelocity: number }) {
-  const baseX = useMotionValue(0);
-  const mainScrollContainer = useContext(ScrollContext);
-  const { scrollY } = useScroll({ container: mainScrollContainer || undefined });
-  const scrollVelocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 50,
-    stiffness: 400
-  });
-  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 5], {
-    clamp: false
-  });
-
-  const x = useTransform(baseX, (v) => `${wrap(-20, -45, v)}%`);
-
-  const directionFactor = useRef<number>(1);
-  useAnimationFrame((t, delta) => {
-    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
-
-    if (velocityFactor.get() < 0) {
-      directionFactor.current = -1;
-    } else if (velocityFactor.get() > 0) {
-      directionFactor.current = 1;
-    }
-
-    moveBy += directionFactor.current * moveBy * velocityFactor.get();
-    baseX.set(baseX.get() + moveBy);
-  });
-
-  return (
-    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap">
-      <motion.div className="flex whitespace-nowrap gap-[clamp(1rem,2vw,3rem)] flex-nowrap" style={{ x, willChange: 'transform' }}>
-        {[...Array(8)].map((_, i) => (
-          <span key={i} className="block text-[clamp(2.5rem,4vw,6rem)] font-light uppercase leading-[0.85] tracking-widest text-zinc-100" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.1)" }}>
-            {children}{" "}
-          </span>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,17 +80,15 @@ export function ContactForm() {
   };
 
   return (
-    <section id="contact" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+    <section id="contact" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-zinc-50">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-[100px] opacity-40 transform-gpu will-change-transform" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-zinc-200/50 rounded-full blur-[100px] opacity-40 transform-gpu will-change-transform" />
       </div>
 
-      {/* Parallax Text Header */}
-      <div className="relative py-[clamp(0.5rem,1vw,1.5rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0">
-        <ParallaxText baseVelocity={1}>CONTATTI • </ParallaxText>
-      </div>
+      {/* Parallax Header */}
+      <ParallaxHeader baseVelocity={1.5}>CONTATTI</ParallaxHeader>
 
       <div className="w-[clamp(40rem,60vw,80rem)] max-w-[90vw] mx-auto relative z-10">
         <motion.div

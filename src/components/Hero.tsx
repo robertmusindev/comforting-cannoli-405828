@@ -154,7 +154,7 @@ export function Hero() {
 
       {/* Core centered content */}
       <div className="relative z-10 w-full px-[clamp(1.5rem,4vw,6rem)] flex flex-col items-center justify-center text-center">
-        <h1 className="text-[clamp(3rem,8vw,12rem)] font-medium tracking-tighter leading-none text-zinc-900 text-center">
+        <h1 className="text-[clamp(3rem,4vw,5rem)] lg:text-[clamp(4rem,6vw,8rem)] xl:text-[clamp(5rem,7vw,10rem)] 3xl:text-[clamp(8rem,9vw,12rem)] font-medium tracking-tighter leading-none text-zinc-900 text-center">
           {words.map((word, wordIndex) => (
             <span key={wordIndex} className="inline-block whitespace-nowrap">
               {word.split("").map((char, charIndex) => {
@@ -184,17 +184,17 @@ export function Hero() {
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ delay: 2.0, duration: 1, ease: "easeOut" }}
           style={{ willChange: "transform, opacity, filter" }}
-          className="mt-[clamp(1.5rem,3vw,4rem)] text-[clamp(1.125rem,2.2vw,2.5rem)] text-zinc-500 max-w-[clamp(40rem,60vw,80rem)] font-light tracking-wide leading-relaxed transform-gpu"
+          className="mt-[clamp(1.5rem,2.5vw,2.5rem)] lg:mt-[clamp(2rem,3vw,3rem)] xl:mt-[clamp(2.5rem,3.5vw,3.5rem)] 3xl:mt-[clamp(3.5rem,4vw,4rem)] text-[clamp(1.125rem,1.8vw,1.75rem)] lg:text-[clamp(1.25rem,2vw,2rem)] xl:text-[clamp(1.5rem,2.2vw,2.25rem)] 3xl:text-[clamp(2rem,2.5vw,2.5rem)] text-zinc-500 max-w-[clamp(40rem,60vw,80rem)] font-light tracking-wide leading-relaxed transform-gpu"
         >
-          <HighlightText text="**Creative Technologist** & **AI Prototyper**." delayOffset={2.2} /> <br className="hidden md:block" />
-          <HighlightText text="Sviluppo prodotti digitali che **scalano**." delayOffset={2.7} />
+          <HighlightText text="**Full Stack Developer**." delayOffset={2.2} /> <br className="hidden md:block" />
+          <HighlightText text="Sviluppo prodotti digitali **scalabili** e **performanti**." delayOffset={2.7} />
         </motion.p>
 
         <motion.div
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ delay: 2.8, duration: 0.8, ease: "easeOut" }}
-           className="mt-[clamp(2.5rem,5vw,7rem)] mb-[clamp(4rem,10vh,8rem)] flex flex-col sm:flex-row items-center gap-[clamp(1.5rem,2vw,3rem)]"
+           className="mt-[clamp(2.5rem,3vw,3.5rem)] lg:mt-[clamp(3rem,4vw,4rem)] xl:mt-[clamp(3.5rem,5vw,5rem)] 3xl:mt-[clamp(4.5rem,6vw,7rem)] mb-[clamp(4rem,10vh,8rem)] flex flex-col sm:flex-row items-center gap-[clamp(1.5rem,2vw,3rem)]"
         >
           <a
             href="#contact"
@@ -247,15 +247,14 @@ export function Hero() {
 const TechTicker = () => {
   const techs = [
     { name: "React", icon: <ReactIcon /> },
-    { name: "Next.js", icon: <NextIcon /> },
+    { name: "Vue.js", icon: <VueIcon /> },
     { name: "TypeScript", icon: <TSIcon /> },
     { name: "Tailwind", icon: <TailwindIcon /> },
+    { name: "HTML5", icon: <HTML5Icon /> },
+    { name: "CSS3", icon: <CSS3Icon /> },
     { name: "Node.js", icon: <NodeIcon /> },
-    { name: "Supabase", icon: <SupabaseIcon /> },
+    { name: "Python", icon: <PythonIcon /> },
     { name: "PostgreSQL", icon: <PostgresIcon /> },
-    { name: "Vite", icon: <ViteIcon /> },
-    { name: "Claude", icon: <ClaudeIcon /> },
-    { name: "Antigravity", icon: <AntigravityIcon /> },
   ];
 
   // Create 4 copies to ensure seamless loop
@@ -372,5 +371,42 @@ const AntigravityIcon = () => (
     <path d="M12 3V1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <path d="M10 5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <path d="M14 5L16 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+const HTML5Icon = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <path d="M12 2L4 5V11C4 16.5 7 21 12 22C17 21 20 16.5 20 11V5L12 2Z" 
+          stroke="currentColor" strokeWidth="1.5" />
+    <text x="12" y="15" textAnchor="middle" fill="currentColor" 
+          fontSize="8" fontWeight="bold">5</text>
+  </svg>
+);
+
+const CSS3Icon = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <path d="M12 2L4 5V11C4 16.5 7 21 12 22C17 21 20 16.5 20 11V5L12 2Z" 
+          stroke="currentColor" strokeWidth="1.5" />
+    <path d="M8 10L12 12L16 10" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M8 14L12 16L16 14" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
+
+const VueIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <path d="M12 4L4 20L12 14L20 20L12 4Z" 
+          stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <path d="M12 4L8 12L12 10L16 12L12 4Z" 
+          stroke="currentColor" strokeWidth="1.5" fill="none" />
+  </svg>
+);
+
+const PythonIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <path d="M9 8C9 9.5 7.5 11 6 11C4.5 11 3 9.5 3 8C3 6.5 4.5 5 6 5C7.5 5 9 6.5 9 8Z" 
+          stroke="currentColor" strokeWidth="1.5" />
+    <path d="M15 16C15 17.5 16.5 19 18 19C19.5 19 21 17.5 21 16C21 14.5 19.5 13 18 13C16.5 13 15 14.5 15 16Z" 
+          stroke="currentColor" strokeWidth="1.5" />
+    <path d="M9 8C9 12 15 10 15 16" stroke="currentColor" strokeWidth="1.5" />
   </svg>
 );

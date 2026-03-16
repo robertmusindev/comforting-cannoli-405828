@@ -232,7 +232,7 @@ const ScrollExpertiseArea = () => {
     });
 
     return (
-        <div ref={containerRef} className="relative w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[300vh] md:snap-start md:snap-always">
+        <div ref={containerRef} className="relative w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[150vh] md:snap-start md:snap-always">
             <div className="sticky top-0 w-full h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-[2px]">
                 {/* Background line fading in and out cleanly */}
                 <motion.div

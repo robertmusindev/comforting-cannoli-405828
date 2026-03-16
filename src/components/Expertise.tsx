@@ -7,41 +7,13 @@ const wrap = (min: number, max: number, v: number) => {
   const rangeSize = max - min;
   return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
 };
-
+import { ParallaxHeader } from "./ParallaxHeader";
 /* ═══════════════════════════════════════════════════
-   1. AI PRODUCT ANIMATION — Neural Network
+   1. FRONTEND ANIMATION — Code Editor & Live Preview
    ═══════════════════════════════════════════════════ */
-const AIProductAnimation = () => {
-  // Node positions for the neural network
-  const nodes = [
-    // Input layer
-    { x: 30, y: 40, r: 5, layer: 0 },
-    { x: 30, y: 96, r: 5, layer: 0 },
-    { x: 30, y: 152, r: 5, layer: 0 },
-    // Hidden layer 1
-    { x: 100, y: 56, r: 6, layer: 1 },
-    { x: 100, y: 96, r: 6, layer: 1 },
-    { x: 100, y: 136, r: 6, layer: 1 },
-    // Hidden layer 2
-    { x: 170, y: 48, r: 6, layer: 2 },
-    { x: 170, y: 96, r: 7, layer: 2 },
-    { x: 170, y: 144, r: 6, layer: 2 },
-    // Output layer
-    { x: 240, y: 72, r: 5, layer: 3 },
-    { x: 240, y: 120, r: 5, layer: 3 },
-  ];
-
-  // Connections between layers
-  const connections: [number, number][] = [];
-  // Input → Hidden 1
-  for (let i = 0; i < 3; i++) for (let j = 3; j < 6; j++) connections.push([i, j]);
-  // Hidden 1 → Hidden 2
-  for (let i = 3; i < 6; i++) for (let j = 6; j < 9; j++) connections.push([i, j]);
-  // Hidden 2 → Output
-  for (let i = 6; i < 9; i++) for (let j = 9; j < 11; j++) connections.push([i, j]);
-
+const FrontendAnimation = () => {
   return (
-    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform">
+    <div className="w-full h-[18rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
       {/* Browser UI */}
       <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -49,352 +21,459 @@ const AIProductAnimation = () => {
         <div className="w-16 h-3 bg-zinc-200 rounded-full ml-2 opacity-50" />
       </div>
 
-      <div className="relative w-full h-full flex items-center justify-center p-4">
-        <svg viewBox="0 0 270 192" className="w-full h-full max-h-[160px]" fill="none">
-          {/* Connections */}
-          {connections.map(([from, to], i) => (
-            <g key={`conn-${i}`}>
-              <line
-                x1={nodes[from].x}
-                y1={nodes[from].y}
-                x2={nodes[to].x}
-                y2={nodes[to].y}
-                stroke="rgba(0,0,0,0.06)"
-                strokeWidth="1"
-              />
-              {/* Traveling data pulse */}
-              <motion.circle
-                r="2"
-                fill="rgba(0,0,0,0.4)"
-                initial={{ opacity: 0 }}
-                animate={{
-                  cx: [nodes[from].x, nodes[to].x],
-                  cy: [nodes[from].y, nodes[to].y],
-                  opacity: [0, 0.8, 0.8, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: (nodes[from].layer * 1.2) + (i % 3) * 0.3,
-                  ease: "easeInOut",
-                  times: [0, 0.1, 0.9, 1],
-                }}
-              />
-            </g>
+      <div className="relative w-full h-full p-3 flex flex-col">
+        {/* Tabs */}
+        <div className="flex gap-2 mb-2">
+          {['HTML', 'CSS', 'JS'].map((tab, i) => (
+            <motion.div
+              key={tab}
+              className="px-2 py-1 text-xs rounded-md bg-zinc-100 text-zinc-600 font-medium cursor-default"
+              animate={{ 
+                backgroundColor: i === 0 ? ['rgb(244 244 245)', 'rgb(228 228 231)', 'rgb(244 244 245)'] : 'rgb(244 244 245)',
+                scale: i === 0 ? [1, 1.05, 1] : 1
+              }}
+              transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
+            >
+              {tab}
+            </motion.div>
           ))}
+        </div>
 
-          {/* Nodes */}
-          {nodes.map((node, i) => (
-            <g key={`node-${i}`}>
-              {/* Glow ring */}
-              <motion.circle
-                cx={node.x}
-                cy={node.y}
-                r={node.r + 4}
-                fill="none"
-                stroke="rgba(0,0,0,0.08)"
-                strokeWidth="1"
-                animate={{
-                  r: [node.r + 4, node.r + 8, node.r + 4],
-                  opacity: [0.3, 0.08, 0.3],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: node.layer * 0.5 + i * 0.15,
-                  ease: "easeInOut",
-                }}
-              />
-              {/* Core node */}
-              <motion.circle
-                cx={node.x}
-                cy={node.y}
-                r={node.r}
-                fill="white"
-                stroke="rgba(0,0,0,0.25)"
-                strokeWidth="1.5"
-                animate={{
-                  fill: ["rgba(255,255,255,1)", "rgba(0,0,0,0.9)", "rgba(255,255,255,1)"],
-                  stroke: ["rgba(0,0,0,0.25)", "rgba(0,0,0,0.7)", "rgba(0,0,0,0.25)"],
-                }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  delay: node.layer * 1.2 + (i % 3) * 0.2,
-                  ease: "easeInOut",
-                }}
-              />
-            </g>
-          ))}
+        {/* Code Editor & Preview */}
+        <div className="flex-1 grid grid-cols-2 gap-3">
+          {/* Code Editor */}
+          <div className="bg-zinc-50 rounded-md p-3 overflow-hidden">
+            <div className="flex gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-red-400" />
+              <div className="w-2 h-2 rounded-full bg-yellow-400" />
+              <div className="w-2 h-2 rounded-full bg-green-400" />
+            </div>
+            <div className="space-y-1">
+              {[
+                { text: '<div className="card">', width: '90%' },
+                { text: '  <h3>Premium UI</h3>', width: '80%' },
+                { text: '  <p>60fps animations</p>', width: '85%' },
+                { text: '  <button>Interact</button>', width: '75%' },
+                { text: '</div>', width: '40%' },
+              ].map((line, i) => (
+                <motion.div
+                  key={i}
+                  className="h-2 bg-zinc-200 rounded"
+                  initial={{ width: 0 }}
+                  animate={{ width: line.width }}
+                  transition={{ duration: 0.8, delay: i * 0.2, repeat: Infinity, repeatDelay: 3 }}
+                  style={{ willChange: 'width' }}
+                />
+              ))}
+            </div>
+          </div>
 
-          {/* Central "brain" icon */}
-          <motion.g
-            animate={{ opacity: [0.15, 0.35, 0.15] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <text x="135" y="185" textAnchor="middle" fontSize="12" fill="rgba(0,0,0,0.3)" fontFamily="system-ui" fontWeight="300" letterSpacing="0.1em">
-              AI MODEL
-            </text>
-          </motion.g>
-        </svg>
+          {/* Live Preview */}
+          <div className="bg-white border border-zinc-200 rounded-md p-3 flex flex-col items-center justify-center">
+            {/* Responsive device frame */}
+            <div className="relative w-16 h-24 border-2 border-zinc-300 rounded-lg mb-2 overflow-hidden">
+              {/* Screen content */}
+              <motion.div 
+                className="absolute inset-1 bg-gradient-to-br from-blue-50 to-purple-50"
+                animate={{ 
+                  background: [
+                    'linear-gradient(135deg, #f0f9ff 0%, #fdf2ff 100%)',
+                    'linear-gradient(135deg, #e0f2fe 0%, #fae8ff 100%)',
+                    'linear-gradient(135deg, #f0f9ff 0%, #fdf2ff 100%)'
+                  ]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+              {/* UI elements */}
+              <motion.div 
+                className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-zinc-300 rounded"
+                animate={{ opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <motion.div 
+                className="absolute top-6 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-purple-400"
+                animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              />
+              <motion.div 
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-zinc-800 rounded-full"
+                animate={{ width: ['2.5rem', '3rem', '2.5rem'] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </div>
+            
+            {/* Tech icons */}
+            <div className="flex gap-1 mt-2">
+              {['React', 'Vue', 'TS', 'TW'].map((tech, i) => (
+                <motion.div
+                  key={tech}
+                  className="px-2 py-0.5 text-[10px] bg-zinc-100 rounded text-zinc-600"
+                  animate={{ 
+                    y: [0, -2, 0],
+                    backgroundColor: ['rgb(244 244 245)', 'rgb(228 228 231)', 'rgb(244 244 245)']
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                >
+                  {tech}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Performance indicator */}
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <div className="flex items-center gap-1">
+            <motion.div 
+              className="w-2 h-2 rounded-full bg-green-500"
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            />
+            <span className="text-xs text-zinc-500">60fps</span>
+          </div>
+          <div className="text-xs text-zinc-400">|</div>
+          <div className="text-xs text-zinc-500">GPU accelerated</div>
+        </div>
       </div>
     </div>
   );
 };
 
 /* ═══════════════════════════════════════════════════
-   2. WEB APP / DASHBOARD ANIMATION (preserved)
+   2. BACKEND ANIMATION — API, Database, Server
    ═══════════════════════════════════════════════════ */
-const WebAppAnimation = () => (
-  <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform">
-    {/* Browser UI */}
-    <div className="h-[clamp(1.5rem,2vw,3rem)] bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
-      <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
-      <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
-      <div className="w-16 h-3 bg-zinc-200 rounded-full ml-2 opacity-50" />
-    </div>
-
-    {/* Content */}
-    <div className="p-4 flex gap-4 h-full">
-      {/* Sidebar */}
-      <motion.div
-        className="w-[clamp(2rem,3vw,4rem)] h-full bg-zinc-50 rounded-[clamp(0.2rem,0.5vw,0.5rem)] flex flex-col gap-2 p-2"
-        initial={{ x: -20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        {[1, 2, 3].map(i => (
-          <motion.div
-            key={i}
-            className="w-full h-2 bg-zinc-200 rounded-sm"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-          />
-        ))}
-      </motion.div>
-
-      {/* Main Dashboard */}
-      <div className="flex-1 flex flex-col gap-3">
-        {/* Header */}
-        <motion.div
-          className="w-full h-8 bg-zinc-50 rounded-lg flex items-center px-3"
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <div className="w-1/3 h-3 bg-zinc-200 rounded-sm" />
-        </motion.div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-2 gap-[clamp(0.5rem,1vw,1rem)] h-full">
-          <motion.div
-            className="h-full bg-zinc-900 rounded-[clamp(0.2rem,0.5vw,0.5rem)] p-2 relative overflow-hidden flex-1"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            {/* Graph Line */}
-            <svg className="absolute bottom-0 left-0 w-full h-full" preserveAspectRatio="none">
-              <motion.path
-                d="M0 80 C 20 60, 40 20, 60 40 S 100 10, 140 30"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              />
-            </svg>
-          </motion.div>
-          <motion.div
-            className="h-full bg-zinc-100 rounded-[clamp(0.2rem,0.5vw,0.5rem)] p-2 flex flex-col justify-between flex-1"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          >
-            <div className="w-8 h-8 rounded-full border-2 border-zinc-300 border-t-zinc-900 animate-spin" />
-            <div className="w-1/2 h-2 bg-zinc-300 rounded-sm" />
-          </motion.div>
-        </div>
-      </div>
-    </div>
-
-    {/* Cursor Overlay */}
-    <motion.div
-      className="absolute top-0 left-0 pointer-events-none"
-      animate={{
-        x: [100, 160, 140, 60, 100],
-        y: [100, 120, 60, 80, 100]
-      }}
-      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-    >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19169L11.7841 12.3673H5.65376Z" fill="black" stroke="white" />
-      </svg>
-    </motion.div>
-  </div>
-);
-
-/* ═══════════════════════════════════════════════════
-   3. API FLOW / AUTOMATION ANIMATION
-   ═══════════════════════════════════════════════════ */
-const APIFlowAnimation = () => {
-  const services = [
-    { x: 24, y: 50, label: "CRM", icon: "👤" },
-    { x: 24, y: 120, label: "DB", icon: "🗄" },
-    { x: 230, y: 50, label: "API", icon: "⚡" },
-    { x: 230, y: 120, label: "MKT", icon: "📊" },
-  ];
-
-  const hub = { x: 127, y: 85 };
-
+const BackendAnimation = () => {
   return (
-    <div className="w-full h-full min-h-[clamp(12rem,15vw,25rem)] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform">
+    <div className="w-full h-[18rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
       {/* Browser UI */}
-      <div className="h-[clamp(1.5rem,2vw,3rem)] bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
-        <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
-        <div className="w-[clamp(0.5rem,0.6vw,1rem)] h-[clamp(0.5rem,0.6vw,1rem)] rounded-full bg-zinc-300" />
+      <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-zinc-300" />
+        <div className="w-2 h-2 rounded-full bg-zinc-300" />
         <div className="w-16 h-3 bg-zinc-200 rounded-full ml-2 opacity-50" />
       </div>
 
-      <div className="relative w-full h-full flex items-center justify-center p-2">
-        <svg viewBox="0 0 270 170" className="w-full h-full max-h-[150px]" fill="none">
-
-          {/* Connection lines from services to hub */}
-          {services.map((svc, i) => (
-            <g key={`line-${i}`}>
-              <line
-                x1={svc.x + 16}
-                y1={svc.y + 12}
-                x2={hub.x}
-                y2={hub.y}
-                stroke="rgba(0,0,0,0.08)"
-                strokeWidth="1.5"
-                strokeDasharray="4 3"
-              />
-              {/* Data packet traveling to hub */}
-              <motion.circle
-                r="3"
-                fill="rgba(0,0,0,0.5)"
-                animate={{
-                  cx: [svc.x + 16, hub.x, svc.x + 16],
-                  cy: [svc.y + 12, hub.y, svc.y + 12],
-                  opacity: [0, 0.7, 0.7, 0.7, 0],
-                }}
-                transition={{
-                  duration: 3.5,
-                  repeat: Infinity,
-                  delay: i * 0.8,
-                  ease: "easeInOut",
-                  times: [0, 0.3, 0.5, 0.7, 1],
-                }}
-              />
-            </g>
-          ))}
-
-          {/* Central Hub — orchestration node */}
-          <motion.circle
-            cx={hub.x}
-            cy={hub.y}
-            r="22"
-            fill="white"
-            stroke="rgba(0,0,0,0.15)"
-            strokeWidth="1.5"
-          />
-          <motion.circle
-            cx={hub.x}
-            cy={hub.y}
-            r="26"
-            fill="none"
-            stroke="rgba(0,0,0,0.06)"
-            strokeWidth="1"
-            animate={{
-              r: [26, 34, 26],
-              opacity: [0.3, 0, 0.3],
-            }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          />
-          {/* Hub rotating ring */}
-          <motion.circle
-            cx={hub.x}
-            cy={hub.y}
-            r="18"
-            fill="none"
-            stroke="rgba(0,0,0,0.15)"
-            strokeWidth="1"
-            strokeDasharray="6 10"
-            style={{ transformOrigin: `${hub.x}px ${hub.y}px` }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          />
-          {/* Hub icon */}
-          <motion.text
-            x={hub.x}
-            y={hub.y + 1}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize="14"
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            ⚙️
-          </motion.text>
-
-          {/* Service boxes */}
-          {services.map((svc, i) => (
-            <g key={`svc-${i}`}>
-              <motion.rect
-                x={svc.x}
-                y={svc.y}
-                width="32"
-                height="24"
-                rx="6"
-                fill="white"
-                stroke="rgba(0,0,0,0.15)"
-                strokeWidth="1.5"
-                animate={{
-                  stroke: ["rgba(0,0,0,0.15)", "rgba(0,0,0,0.4)", "rgba(0,0,0,0.15)"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: i * 0.8,
-                  ease: "easeInOut",
-                }}
-              />
-              <text
-                x={svc.x + 16}
-                y={svc.y + 14}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize="10"
+      <div className="relative w-full h-full p-3 flex flex-col">
+        {/* API Endpoints - More compact */}
+        <div className="mb-3">
+          <div className="text-xs text-zinc-400 font-medium mb-1">API Endpoints</div>
+          <div className="space-y-0.5">
+            {['GET /api/users', 'POST /api/auth', 'PUT /api/data', 'DELETE /api/logs'].map((endpoint, i) => (
+              <motion.div
+                key={endpoint}
+                className="flex items-center gap-1.5"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: i * 0.2 }}
               >
-                {svc.icon}
-              </text>
-              <text
-                x={svc.x + 16}
-                y={svc.y + 34}
-                textAnchor="middle"
-                fontSize="7"
-                fill="rgba(0,0,0,0.3)"
-                fontFamily="system-ui"
-                fontWeight="400"
-              >
-                {svc.label}
-              </text>
-            </g>
-          ))}
+                <motion.div 
+                  className="w-1.5 h-1.5 rounded-full"
+                  animate={{ 
+                    backgroundColor: [
+                      'rgb(34 197 94)',  // green
+                      'rgb(59 130 246)', // blue  
+                      'rgb(234 179 8)',  // yellow
+                      'rgb(239 68 68)',  // red
+                      'rgb(34 197 94)',  // green
+                    ]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
+                />
+                <div className="text-[11px] font-mono text-zinc-600 truncate">{endpoint}</div>
+                <motion.div 
+                  className="ml-auto w-6 h-1 bg-zinc-200 rounded-full overflow-hidden"
+                  animate={{ scaleX: [0, 1, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
-          {/* Subtle label */}
-          <motion.g
-            animate={{ opacity: [0.15, 0.3, 0.15] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <text x="135" y="162" textAnchor="middle" fontSize="8" fill="rgba(0,0,0,0.25)" fontFamily="system-ui" fontWeight="300" letterSpacing="0.1em">
-              ORCHESTRATION
-            </text>
-          </motion.g>
-        </svg>
+        {/* Database & Server Visualization - More compact */}
+        <div className="flex-1 grid grid-cols-2 gap-2">
+          {/* Database Section */}
+          <div className="bg-gradient-to-br from-zinc-50 to-blue-50 rounded p-2 flex flex-col">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+              <div className="text-[11px] font-medium text-zinc-700 truncate">PostgreSQL</div>
+            </div>
+            
+            {/* Database tables */}
+            <div className="space-y-1 flex-1">
+              {['users', 'products', 'orders', 'analytics'].map((table, i) => (
+                <motion.div
+                  key={table}
+                  className="bg-white/80 border border-zinc-200 rounded px-1.5 py-1"
+                  animate={{ 
+                    boxShadow: [
+                      '0 0 0 0 rgba(59, 130, 246, 0)',
+                      '0 0 0 1px rgba(59, 130, 246, 0.3)',
+                      '0 0 0 0 rgba(59, 130, 246, 0)'
+                    ]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, delay: i * 0.8 }}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="text-[9px] font-medium text-zinc-600 truncate">{table}</div>
+                    <motion.div 
+                      className="w-1.5 h-1.5 rounded-full bg-blue-400"
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.4 }}
+                    />
+                  </div>
+                  <motion.div 
+                    className="h-0.5 bg-blue-200 rounded-full mt-0.5"
+                    initial={{ width: 0 }}
+                    animate={{ width: ['0%', '100%', '0%'] }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.6 }}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Server Section */}
+          <div className="bg-gradient-to-br from-zinc-50 to-emerald-50 rounded p-2 flex flex-col">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <div className="text-[11px] font-medium text-zinc-700 truncate">Node.js / Python</div>
+            </div>
+            
+            {/* Server processes */}
+            <div className="space-y-1.5 flex-1">
+              {[
+                { name: 'Auth', cpu: 30 },
+                { name: 'Processing', cpu: 65 },
+                { name: 'API Gateway', cpu: 45 },
+              ].map((process, i) => (
+                <div key={process.name} className="space-y-0.5">
+                  <div className="flex justify-between items-center">
+                    <div className="text-[9px] font-medium text-zinc-600 truncate">{process.name}</div>
+                    <div className="text-[9px] text-zinc-400">{process.cpu}%</div>
+                  </div>
+                  <div className="h-1 bg-zinc-200 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${process.cpu}%` }}
+                      transition={{ duration: 0.8, delay: i * 0.3 }}
+                    />
+                  </div>
+                </div>
+              ))}
+              
+              {/* Server activity indicator */}
+              <div className="mt-2 pt-1.5 border-t border-zinc-200">
+                <div className="flex items-center gap-1">
+                  <motion.div 
+                    className="w-1 h-1 rounded-full bg-emerald-500"
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  />
+                  <div className="text-[9px] text-zinc-500">Processing</div>
+                  <div className="ml-auto">
+                    <motion.div 
+                      className="w-3 h-3 border border-emerald-400 border-t-transparent rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Bar - More compact */}
+        <div className="mt-2 pt-1.5 border-t border-zinc-200 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-0.5">
+              <motion.div 
+                className="w-1 h-1 rounded-full bg-green-500"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+              <span className="text-[10px] text-zinc-500">Online</span>
+            </div>
+            <div className="text-[10px] text-zinc-400">|</div>
+            <div className="text-[10px] text-zinc-500">99.9% uptime</div>
+          </div>
+          <div className="text-[10px] text-zinc-400 font-mono">~2ms</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════
+   3. END-TO-END SOLUTION ANIMATION — Product Lifecycle (Responsive)
+   ═══════════════════════════════════════════════════ */
+const EndToEndAnimation = () => {
+  const phases = [
+    { label: "Ideazione", icon: "💡", color: "from-blue-400 to-cyan-400" },
+    { label: "Design", icon: "🎨", color: "from-purple-400 to-pink-400" },
+    { label: "Sviluppo", icon: "⚡", color: "from-green-400 to-emerald-400" },
+    { label: "Testing", icon: "🧪", color: "from-yellow-400 to-orange-400" },
+    { label: "Deploy", icon: "🚀", color: "from-red-400 to-rose-400" },
+    { label: "Monitor", icon: "📊", color: "from-indigo-400 to-violet-400" },
+  ];
+
+  return (
+    <div className="w-full h-[18rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
+      {/* Browser UI */}
+      <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-zinc-300" />
+        <div className="w-2 h-2 rounded-full bg-zinc-300" />
+        <div className="w-16 h-3 bg-zinc-200 rounded-full ml-2 opacity-50" />
+      </div>
+
+      <div className="relative w-full h-full p-3 md:p-4 flex flex-col">
+        {/* Timeline Header */}
+        <div className="flex items-center justify-between mb-3 md:mb-4">
+          <div className="text-xs text-zinc-400 font-medium">Product Lifecycle</div>
+          <div className="flex items-center gap-1">
+            <motion.div 
+              className="w-1.5 h-1.5 rounded-full bg-green-500"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+            <span className="text-xs text-zinc-500">Live</span>
+          </div>
+        </div>
+
+        {/* Animated Timeline - Responsive */}
+        <div className="flex-1 relative min-h-[120px] md:min-h-[140px]">
+          {/* Timeline line - hide on very small screens */}
+          <div className="hidden sm:block absolute left-0 right-0 top-1/2 h-0.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 -translate-y-1/2" />
+          
+          {/* For mobile: grid layout */}
+          <div className="sm:hidden grid grid-cols-3 gap-3 h-full items-center justify-center">
+            {phases.slice(0, 6).map((phase, i) => (
+              <motion.div
+                key={phase.label}
+                className="flex flex-col items-center"
+                animate={{ 
+                  y: [0, -4, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  delay: i * 0.3 
+                }}
+              >
+                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-md`}>
+                  <span className="text-sm md:text-lg">{phase.icon}</span>
+                </div>
+                <div className="text-[9px] md:text-[10px] font-medium text-zinc-700 mt-1 text-center">{phase.label}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* For desktop: timeline layout */}
+          <div className="hidden sm:block">
+            {/* Phase dots and connections */}
+            {phases.map((phase, i) => {
+              const position = `${(i / (phases.length - 1)) * 100}%`;
+              return (
+                <div key={phase.label} className="absolute top-1/2 -translate-y-1/2" style={{ left: position }}>
+                  {/* Connection line animation */}
+                  <motion.div
+                    className="absolute w-8 md:w-12 h-0.5 bg-gradient-to-r from-zinc-300 to-transparent -left-8 md:-left-12 top-1/2"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity, repeatDelay: 2 }}
+                  />
+                  
+                  {/* Phase dot */}
+                  <motion.div
+                    className="relative z-10"
+                    animate={{ 
+                      y: [0, -6, 0],
+                      scale: [1, 1.15, 1]
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity,
+                      delay: i * 0.4 
+                    }}
+                  >
+                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-lg`}>
+                      <span className="text-sm md:text-lg">{phase.icon}</span>
+                    </div>
+                    
+                    {/* Pulse effect */}
+                    <motion.div
+                      className="absolute inset-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br opacity-30"
+                      style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))` }}
+                      animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0, 0.3] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                    />
+                  </motion.div>
+                  
+                  {/* Phase label */}
+                  <motion.div
+                    className="absolute -bottom-5 md:-bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.2 }}
+                  >
+                    <div className="text-[9px] md:text-[10px] font-medium text-zinc-700 text-center">{phase.label}</div>
+                  </motion.div>
+                </div>
+              );
+            })}
+
+            {/* Progress dot moving through timeline */}
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 rounded-full bg-white border-2 border-zinc-800 shadow-lg z-20"
+              animate={{ left: ["0%", "100%", "0%"] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </div>
+        </div>
+
+        {/* Deployment Pipeline Visualization */}
+        <div className="mt-4 md:mt-6 grid grid-cols-3 gap-1 md:gap-2">
+          {['Dev', 'Stage', 'Prod'].map((env, i) => (
+            <motion.div
+              key={env}
+              className="bg-zinc-50 rounded md:rounded-md p-1.5 md:p-2 flex flex-col items-center"
+              animate={{ 
+                backgroundColor: i === 2 ? ['rgb(244 244 245)', 'rgb(229 231 235)', 'rgb(244 244 245)'] : 'rgb(244 244 245)',
+                borderColor: i === 2 ? ['rgb(209 213 219)', 'rgb(59 130 246)', 'rgb(209 213 219)'] : 'rgb(209 213 219)'
+              }}
+              transition={{ duration: 3, repeat: Infinity, delay: i * 1 }}
+            >
+              <div className="text-[10px] md:text-xs font-medium text-zinc-600">{env}</div>
+              <div className="flex items-center gap-0.5 md:gap-1 mt-0.5 md:mt-1">
+                <motion.div 
+                  className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-green-500"
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.5 }}
+                />
+                <div className="text-[9px] md:text-[10px] text-zinc-400">Active</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="mt-3 md:mt-4 pt-2 md:pt-3 border-t border-zinc-200 flex items-center justify-between">
+          <div className="flex items-center gap-1 md:gap-2">
+            <div className="flex items-center gap-0.5 md:gap-1">
+              <motion.div 
+                className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-blue-500"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              />
+              <span className="text-[10px] md:text-xs text-zinc-500">CI/CD</span>
+            </div>
+            <div className="text-[10px] md:text-xs text-zinc-400">|</div>
+            <div className="text-[10px] md:text-xs text-zinc-500 hidden xs:inline">Auto-scaling</div>
+          </div>
+          <div className="text-[10px] md:text-xs text-zinc-400 font-mono">99.99%</div>
+        </div>
       </div>
     </div>
   );
@@ -405,19 +484,19 @@ const APIFlowAnimation = () => {
    ═══════════════════════════════════════════════════ */
 const expertiseAreas = [
   {
-    title: "Prodotti AI su Misura",
-    description: "Integro le API dei modelli più avanzati (GPT, Claude, Gemini) per creare soluzioni intelligenti: chatbot, generazione contenuti, automazioni cognitive. Non uso l'AI — la costruisco dentro il prodotto.",
-    animation: AIProductAnimation,
+    title: "Eccellenza nel Frontend",
+    description: "Architettura di interfacce utente reattive e accessibili con React e Vue.js. Attento alla semantica HTML5, all'estetica CSS3 e alla rapidità di sviluppo con Tailwind CSS per esperienze utente premium.",
+    animation: FrontendAnimation,
   },
   {
-    title: "Web App & Gestionali",
-    description: "Sistemi custom, dashboard, SPA robuste. Costruite con React, TypeScript e backend moderni (Supabase, Node.js) per automatizzare e scalare il tuo business.",
-    animation: WebAppAnimation,
+    title: "Backend Solido & Dati",
+    description: "Sviluppo di API robuste e logiche server-side efficienti. Utilizzo Node.js e Python per creare sistemi scalabili, abbinati alla potenza di PostgreSQL per una gestione dati sicura e strutturata.",
+    animation: BackendAnimation,
   },
   {
-    title: "Automazioni & Integrazioni API",
-    description: "Orchestro flussi complessi tra API, database e servizi di terze parti. Collego il tuo ecosistema (CRM, Analytics, Marketing) con soluzioni low-code e custom che lavorano 24/7.",
-    animation: APIFlowAnimation,
+    title: "Soluzioni End-to-End",
+    description: "Visione completa del ciclo di vita del prodotto. Dallo schema al deployment, creo applicazioni web scalabili e ad alte prestazioni, garantendo coerenza e manutenibilità in ogni fase.",
+    animation: EndToEndAnimation,
   },
 ];
 
@@ -512,78 +591,30 @@ function ParallaxText({ children, baseVelocity = 100 }: { children: string; base
   });
 
   return (
-    <div className="w-full overflow-hidden whitespace-nowrap flex flex-nowrap relative py-4">
-      {/* Subtle animated blur glow behind the text to boost the wow effect */}
-      <motion.div 
-        className="absolute top-1/2 left-0 right-0 h-1/2 bg-gradient-to-r from-zinc-500/0 via-zinc-200/50 to-zinc-500/0 -translate-y-1/2 blur-2xl pointer-events-none z-[-1]"
-        animate={{ opacity: [0.3, 0.6, 0.3], scaleY: [1, 1.2, 1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div className="flex whitespace-nowrap gap-[clamp(1rem,2vw,3rem)] flex-nowrap" style={{ x }}>
-        {[...Array(8)].map((_, i) => (
-          <span 
-            key={i} 
-            className="block text-[clamp(4rem,8vw,12rem)] font-bold uppercase leading-[0.85] tracking-tight text-white drop-shadow-md mix-blend-difference" 
-            style={{ WebkitTextStroke: "1px rgba(0,0,0,0.15)" }}
-          >
-            {children} 
-          </span>
-        ))}
-      </motion.div>
+    <div style={{ x }} className="whitespace-nowrap">
+      <span className="text-[clamp(6rem,15vw,30rem)] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 opacity-90">
+        {children} 
+      </span>
+      <span className="text-[clamp(6rem,15vw,30rem)] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 opacity-90">
+        {children}
+      </span>
+      <span className="text-[clamp(6rem,15vw,30rem)] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 opacity-90">
+        {children}
+      </span>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════
-   MAIN COMPONENT
+   EXPERTISE COMPONENT
    ═══════════════════════════════════════════════════ */
-export function Expertise() {
-  // Floating background decorative particles
-  const particles = useMemo(() => Array.from({ length: 15 }).map(() => ({
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 200 + 50,
-    duration: Math.random() * 20 + 20,
-  })), []);
-
+export default function Expertise() {
   return (
-    <section id="expertise" className="py-0 pb-[clamp(3rem,5vw,8rem)] relative overflow-hidden w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-zinc-50">
-      
-      {/* Decorative premium background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-        {particles.map((p, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full bg-zinc-200/50 blur-[80px]"
-              style={{
-                  width: p.size,
-                  height: p.size,
-                  left: `${p.x}%`,
-                  top: `${p.y}%`,
-              }}
-              animate={{
-                  y: ["-30vh", "30vh"],
-                  x: ["-20vw", "20vw"],
-                  opacity: [0.1, 0.4, 0.1],
-                  scale: [1, 1.2, 1]
-              }}
-              transition={{
-                  duration: p.duration,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                  delay: i * -5,
-              }}
-            />
-        ))}
-      </div>
+    <section className="relative pt-0 pb-[clamp(1rem,2vw,3rem)] 2xl:pt-0 2xl:pb-0 bg-white overflow-hidden min-h-screen flex flex-col justify-start md:justify-center">
+      {/* Premium Divider / Parallax Text Header */}
+      <ParallaxHeader baseVelocity={-1.5}>EXPERTISE</ParallaxHeader>
 
-      {/* Premium Divider / Parallax Text */}
-      <div className="relative py-[clamp(1rem,2vw,3rem)] mb-[clamp(0.5rem,1vw,2rem)] overflow-hidden pointer-events-none z-0 mt-8">
-        <ParallaxText baseVelocity={-1.5}>EXPERTISE • </ParallaxText>
-      </div>
-
-      <div className="w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-[clamp(0.5rem,1.5vw,3vw)] flex justify-center relative z-10">
+      <div className="w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-[clamp(0.5rem,1.5vw,3vw)] flex justify-center relative z-10 flex-grow items-center 2xl:mt-4">
         {/* Simulated Mac Window */}
         <motion.div
           initial={{ opacity: 0, y: 80, scale: 0.95, rotateX: 10 }}
@@ -597,7 +628,7 @@ export function Expertise() {
             willChange: "transform, opacity"
           }}
           style={{ perspective: "1500px" }}
-          className="w-full max-w-[min(98vw,160rem)] max-h-[85vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
+          className="w-full max-w-[min(98vw,180rem)] h-auto md:min-h-[60vh] md:max-h-[80vh] 2xl:min-h-[75vh] 2xl:max-h-[90vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
         >
           {/* Window Header */}
           <div className="bg-white/80 backdrop-blur-md border-b border-zinc-200/50 px-[clamp(1rem,2vw,2.5rem)] py-[clamp(0.5rem,1vw,1.25rem)] flex items-center gap-[clamp(0.5rem,0.8vw,1.5rem)] sticky top-0 z-10">
@@ -612,7 +643,7 @@ export function Expertise() {
           </div>
 
           {/* Window Content */}
-          <div className="p-[clamp(1rem,2.5vw,6rem)] grid grid-cols-1 md:grid-cols-3 gap-[clamp(1rem,2.5vw,5rem)] bg-white flex-1 overflow-y-auto w-full custom-scrollbar">
+          <div className="p-4 md:p-6 xl:p-8 2xl:p-12 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6 md:gap-8 xl:gap-12 bg-white flex-1 md:overflow-y-auto w-full custom-scrollbar">
             {expertiseAreas.map((area, i) => (
               <motion.div
                 key={area.title}
@@ -625,23 +656,23 @@ export function Expertise() {
                   type: "spring",
                   bounce: 0.2
                 }}
-                className="group flex flex-col gap-[clamp(1rem,1.5vw,2.5rem)] h-full w-full"
+                className="group flex flex-col h-full w-full"
                 style={{ willChange: "transform, opacity, filter" }}
               >
                 {/* Animation Container */}
-                <div className="w-full h-auto aspect-[4/3] flex items-center justify-center relative">
-                  <area.animation />
-                  {/* Subtle reflection under animation */}
-                  <div className="absolute -bottom-8 left-0 right-0 h-8 bg-gradient-to-b from-black/5 to-transparent blur-md transform -scale-y-100 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="w-full h-[18rem] flex items-center justify-center relative mb-4">
+                  <div className="w-full">
+                    <area.animation />
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-[clamp(0.5rem,0.8vw,1.5rem)] mt-auto flex-1">
+                <div className="flex flex-col flex-1 pt-2 md:pt-4">
                   <StaggeredTextReveal 
                     text={area.title}
-                    className="text-[clamp(1.2rem,1.8vw,3rem)] font-medium text-zinc-900 tracking-tight leading-tight" 
+                    className="text-[clamp(1.1rem,1.8vw,1.6rem)] 2xl:text-[clamp(1.8rem,2.5vw,3.5rem)] font-medium text-zinc-900 tracking-tight leading-tight min-h-[3.5rem] flex items-start" 
                     delayOffset={i * 0.1 + 0.2}
                   />
-                  <p className="text-zinc-500 leading-snug font-light text-[clamp(0.85rem,1vw,1.8rem)]">
+                  <p className="text-zinc-500 leading-tight lg:leading-snug font-light text-[clamp(0.8rem,1vw,1rem)] 2xl:text-[clamp(1rem,1.2vw,1.8rem)] pb-4 min-h-[6rem]">
                     {area.description}
                   </p>
                 </div>
