@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import { HighlightText } from "./About";
 
 const charVariants = {
   hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
@@ -154,7 +153,14 @@ export function Hero() {
 
       {/* Core centered content */}
       <div className="relative z-10 w-full px-[clamp(1.5rem,4vw,6rem)] flex flex-col items-center justify-center text-center">
-        <h1 className="text-[clamp(3rem,4vw,5rem)] lg:text-[clamp(4rem,6vw,8rem)] xl:text-[clamp(5rem,7vw,10rem)] 3xl:text-[clamp(8rem,9vw,12rem)] font-medium tracking-tighter leading-none text-zinc-900 text-center">
+        {/* Mobile-only heading: "Robert Musin, full stack developer" */}
+        <div className="md:hidden text-[clamp(2.2rem,7vw,3.5rem)] font-medium tracking-tighter leading-tight text-zinc-900 text-center mb-[clamp(0.75rem,2vw,1.25rem)]">
+          Robert Musin,{" "}
+          <span className="underline decoration-zinc-900 underline-offset-4">full stack developer</span>
+        </div>
+
+        {/* Desktop animated h1 */}
+        <h1 className="hidden md:block text-[clamp(3rem,4vw,5rem)] lg:text-[clamp(4rem,6vw,8rem)] xl:text-[clamp(5rem,7vw,10rem)] 3xl:text-[clamp(8rem,9vw,12rem)] font-medium tracking-tighter leading-none text-zinc-900 text-center">
           {words.map((word, wordIndex) => (
             <span key={wordIndex} className="inline-block whitespace-nowrap">
               {word.split("").map((char, charIndex) => {
@@ -186,8 +192,14 @@ export function Hero() {
           style={{ willChange: "transform, opacity, filter" }}
           className="mt-[clamp(1.5rem,2.5vw,2.5rem)] lg:mt-[clamp(2rem,3vw,3rem)] xl:mt-[clamp(2.5rem,3.5vw,3.5rem)] 3xl:mt-[clamp(3.5rem,4vw,4rem)] text-[clamp(1.125rem,1.8vw,1.75rem)] lg:text-[clamp(1.25rem,2vw,2rem)] xl:text-[clamp(1.5rem,2.2vw,2.25rem)] 3xl:text-[clamp(2rem,2.5vw,2.5rem)] text-zinc-500 max-w-[clamp(40rem,60vw,80rem)] font-light tracking-wide leading-relaxed transform-gpu"
         >
-          <HighlightText text="**Full Stack Developer**." delayOffset={2.2} /> <br className="hidden md:block" />
-          <HighlightText text="Sviluppo prodotti digitali **scalabili** e **performanti**." delayOffset={2.7} />
+          <span className="hidden md:inline">
+            <span className="underline decoration-zinc-900 underline-offset-4 font-medium text-zinc-900">Full Stack Developer</span>.{" "}
+            <br />
+          </span>
+          Sviluppo prodotti digitali{" "}
+          <span className="underline decoration-zinc-500 underline-offset-4">scalabili</span>{" "}
+          e{" "}
+          <span className="underline decoration-zinc-500 underline-offset-4">performanti</span>.
         </motion.p>
 
         <motion.div

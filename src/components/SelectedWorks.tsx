@@ -1,7 +1,8 @@
-  import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { ProjectDetail, Work } from "./ProjectDetail";
 import { ParallaxHeader } from "./ParallaxHeader";
+import svuotafrigoImg from "./pics/iScreen Shoter - Safari - 260316021510.jpg";
 
 
 const works: Work[] = [
@@ -24,18 +25,18 @@ const works: Work[] = [
   },
   {
     id: 2,
-    title: "Klen Portfolio",
-    category: "Creative Portfolio",
-    description: "Portfolio su misura con UI/UX custom e interazioni uniche.",
-    fullDescription: "Sito web portfolio realizzato su misura per Klen, caratterizzato da un design unico e un'interfaccia utente (UI) sviluppata da zero. Ogni elemento, in particolare i pulsanti personalizzati e le interazioni, è stato curato nei minimi dettagli per garantire un'esperienza visiva originale e immersiva, senza l'utilizzo di template pre-fatti.",
-    image: "https://i.imgur.com/CSjF4n6.jpeg",
-    tech: ["React", "Motion", "Custom UI"],
-    year: "2024",
-    link: "https://animated-croquembouche-87d583.netlify.app",
+    title: "Svuota Frigo",
+    category: "AI SaaS",
+    description: "SaaS che trasforma gli ingredienti del tuo frigo in ricette gourmet grazie all'AI.",
+    fullDescription: "Svuota Frigo risolve la domanda quotidiana: 'cosa cucino con quello che ho?' L'utente inserisce gli ingredienti disponibili e, grazie all'integrazione con API AI, riceve istantaneamente ricette gourmet personalizzate, dettagliate e creative. Un'esperienza culinaria intelligente, veloce e su misura — dal frigo al piatto in pochi secondi.",
+    image: svuotafrigoImg,
+    tech: ["React", "AI API", "Supabase", "Tailwind"],
+    year: "2025",
+    link: "https://robertmusindev.github.io/svuotafrigo/",
     metrics: [
-      { label: "Template Pre-Fatti", value: "0%", icon: "Zap" },
-      { label: "Visitatori Unici (Primo Mese)", value: "+300%", icon: "Users" },
-      { label: "Tempo di Permanenza", value: "3m 45s", icon: "Clock" }
+      { label: "Generazione Ricette", value: "AI", icon: "Zap" },
+      { label: "Tempo di Risposta", value: "<2s", icon: "Clock" },
+      { label: "Ingredienti Supportati", value: "∞", icon: "TrendingUp" }
     ]
   },
   {
@@ -87,7 +88,7 @@ export function SelectedWorks() {
             willChange: "transform, opacity"
           }}
           style={{ perspective: "1500px" }}
-          className="w-full max-w-[min(98vw,180rem)] h-auto md:min-h-[60vh] md:max-h-[80vh] 2xl:min-h-[75vh] 2xl:max-h-[90vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
+          className="w-full max-w-[min(98vw,180rem)] h-auto md:min-h-[60vh] md:max-h-[80vh] 2xl:min-h-[85vh] 2xl:max-h-[92vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
         >
           {/* Window Header */}
           <div className="bg-white/80 backdrop-blur-md border-b border-zinc-200/50 px-[clamp(1rem,2vw,2.5rem)] py-[clamp(0.5rem,1vw,1.25rem)] flex items-center gap-[clamp(0.5rem,0.8vw,1.5rem)] sticky top-0 z-10">
@@ -120,7 +121,7 @@ export function SelectedWorks() {
                 onClick={() => setSelectedProject(work)}
               >
                 {/* Image Container with Hover Effect */}
-                <div className="w-full h-[18rem] rounded-xl overflow-hidden relative mb-4 bg-zinc-100 transform-gpu">
+                <div className="w-full h-[18rem] 2xl:h-[clamp(22rem,35vh,50rem)] rounded-xl overflow-hidden relative mb-4 bg-zinc-100 transform-gpu">
                   <motion.img
                     src={work.image}
                     alt={work.title}
@@ -158,15 +159,29 @@ export function SelectedWorks() {
 
                 {/* Content */}
                 <div className="flex flex-col flex-1 pt-2 md:pt-4">
-                  <h3 className="text-[clamp(1.1rem,1.8vw,1.6rem)] 2xl:text-[clamp(1.8rem,2.5vw,3.5rem)] font-medium text-zinc-900 tracking-tight leading-tight min-h-[3.5rem] flex items-start">
+                  <h3 className="text-[clamp(1.1rem,1.8vw,1.6rem)] 2xl:text-[clamp(1.8rem,2.5vw,3.5rem)] font-medium text-zinc-900 tracking-tight leading-tight mb-2">
                     {work.title}
                   </h3>
-                  <p className="text-zinc-500 leading-tight lg:leading-snug font-light text-[clamp(0.8rem,1vw,1rem)] 2xl:text-[clamp(1rem,1.2vw,1.8rem)] pb-4 min-h-[4rem] line-clamp-2">
+                  <p className="text-zinc-500 leading-snug font-light text-[clamp(0.8rem,1vw,1rem)] 2xl:text-[clamp(1rem,1.2vw,1.8rem)] pb-3">
                     {work.description}
                   </p>
-                  
+
+                  {/* Metrics */}
+                  <div className="grid grid-cols-3 gap-2 py-3 border-t border-b border-zinc-100 mb-3">
+                    {work.metrics.map((metric, mi) => (
+                      <div key={mi} className="text-center">
+                        <div className="text-[clamp(0.9rem,1.1vw,1.2rem)] 2xl:text-[clamp(1.2rem,1.4vw,2rem)] font-semibold text-zinc-900 leading-tight">
+                          {metric.value}
+                        </div>
+                        <div className="text-[clamp(0.6rem,0.7vw,0.75rem)] 2xl:text-[clamp(0.75rem,0.85vw,1rem)] text-zinc-400 leading-tight mt-0.5">
+                          {metric.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                   {/* Category */}
-                  <div className="mt-auto pt-4 border-t border-zinc-100">
+                  <div className="mt-auto pt-3 border-t border-zinc-100">
                     <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">
                       {work.category}
                     </span>

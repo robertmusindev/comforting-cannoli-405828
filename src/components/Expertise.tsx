@@ -13,7 +13,7 @@ import { ParallaxHeader } from "./ParallaxHeader";
    ═══════════════════════════════════════════════════ */
 const FrontendAnimation = () => {
   return (
-    <div className="w-full h-[18rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
+    <div className="w-full h-full min-h-[14rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
       {/* Browser UI */}
       <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -144,7 +144,7 @@ const FrontendAnimation = () => {
    ═══════════════════════════════════════════════════ */
 const BackendAnimation = () => {
   return (
-    <div className="w-full h-[18rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
+    <div className="w-full h-full min-h-[14rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
       {/* Browser UI */}
       <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -157,7 +157,7 @@ const BackendAnimation = () => {
         <div className="mb-3">
           <div className="text-xs text-zinc-400 font-medium mb-1">API Endpoints</div>
           <div className="space-y-0.5">
-            {['GET /api/users', 'POST /api/auth', 'PUT /api/data', 'DELETE /api/logs'].map((endpoint, i) => (
+            {['GET /api/users', 'POST /api/auth', 'POST /api/llm/chat', 'PUT /api/data'].map((endpoint, i) => (
               <motion.div
                 key={endpoint}
                 className="flex items-center gap-1.5"
@@ -236,14 +236,14 @@ const BackendAnimation = () => {
           <div className="bg-gradient-to-br from-zinc-50 to-emerald-50 rounded p-2 flex flex-col">
             <div className="flex items-center gap-1.5 mb-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <div className="text-[11px] font-medium text-zinc-700 truncate">Node.js / Python</div>
+              <div className="text-[11px] font-medium text-zinc-700 truncate">Node.js · Python · C# · .NET</div>
             </div>
             
             {/* Server processes */}
             <div className="space-y-1.5 flex-1">
               {[
                 { name: 'Auth', cpu: 30 },
-                { name: 'Processing', cpu: 65 },
+                { name: 'LLM API', cpu: 72 },
                 { name: 'API Gateway', cpu: 45 },
               ].map((process, i) => (
                 <div key={process.name} className="space-y-0.5">
@@ -315,11 +315,10 @@ const EndToEndAnimation = () => {
     { label: "Sviluppo", icon: "⚡", color: "from-green-400 to-emerald-400" },
     { label: "Testing", icon: "🧪", color: "from-yellow-400 to-orange-400" },
     { label: "Deploy", icon: "🚀", color: "from-red-400 to-rose-400" },
-    { label: "Monitor", icon: "📊", color: "from-indigo-400 to-violet-400" },
   ];
 
   return (
-    <div className="w-full h-[18rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
+    <div className="w-full h-full min-h-[14rem] bg-white rounded-xl border border-zinc-200 overflow-hidden relative shadow-sm group-hover:shadow-md hover:-translate-y-1 transition-all duration-500 will-change-transform transform-gpu">
       {/* Browser UI */}
       <div className="h-6 bg-zinc-50 border-b border-zinc-100 flex items-center px-3 gap-1.5">
         <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -346,9 +345,9 @@ const EndToEndAnimation = () => {
           {/* Timeline line - hide on very small screens */}
           <div className="hidden sm:block absolute left-0 right-0 top-1/2 h-0.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 -translate-y-1/2" />
           
-          {/* For mobile: grid layout */}
-          <div className="sm:hidden grid grid-cols-3 gap-3 h-full items-center justify-center">
-            {phases.slice(0, 6).map((phase, i) => (
+          {/* For mobile: flex centrato */}
+          <div className="sm:hidden flex flex-wrap justify-center gap-3 h-full items-center">
+            {phases.map((phase, i) => (
               <motion.div
                 key={phase.label}
                 className="flex flex-col items-center"
@@ -370,72 +369,51 @@ const EndToEndAnimation = () => {
             ))}
           </div>
 
-          {/* For desktop: timeline layout */}
-          <div className="hidden sm:block">
-            {/* Phase dots and connections */}
-            {phases.map((phase, i) => {
-              const position = `${(i / (phases.length - 1)) * 100}%`;
-              return (
-                <div key={phase.label} className="absolute top-1/2 -translate-y-1/2" style={{ left: position }}>
-                  {/* Connection line animation */}
-                  <motion.div
-                    className="absolute w-8 md:w-12 h-0.5 bg-gradient-to-r from-zinc-300 to-transparent -left-8 md:-left-12 top-1/2"
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity, repeatDelay: 2 }}
-                  />
-                  
-                  {/* Phase dot */}
-                  <motion.div
-                    className="relative z-10"
-                    animate={{ 
-                      y: [0, -6, 0],
-                      scale: [1, 1.15, 1]
-                    }}
-                    transition={{ 
-                      duration: 2, 
-                      repeat: Infinity,
-                      delay: i * 0.4 
-                    }}
-                  >
-                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-lg`}>
-                      <span className="text-sm md:text-lg">{phase.icon}</span>
-                    </div>
-                    
-                    {/* Pulse effect */}
-                    <motion.div
-                      className="absolute inset-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br opacity-30"
-                      style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))` }}
-                      animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0, 0.3] }}
-                      transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
-                    />
-                  </motion.div>
-                  
-                  {/* Phase label */}
-                  <motion.div
-                    className="absolute -bottom-5 md:-bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.2 }}
-                  >
-                    <div className="text-[9px] md:text-[10px] font-medium text-zinc-700 text-center">{phase.label}</div>
-                  </motion.div>
-                </div>
-              );
-            })}
+          {/* For desktop: flexbox layout — perfectly centered, no overflow */}
+          <div className="hidden sm:flex items-center justify-between w-full h-full relative">
+            {/* Timeline line */}
+            <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 -translate-y-1/2 pointer-events-none" />
 
-            {/* Progress dot moving through timeline */}
+            {/* Progress dot */}
             <motion.div
-              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 rounded-full bg-white border-2 border-zinc-800 shadow-lg z-20"
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 rounded-full bg-white border-2 border-zinc-800 shadow-lg z-20 pointer-events-none"
               animate={{ left: ["0%", "100%", "0%"] }}
               transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
             />
+
+            {phases.map((phase, i) => (
+              <div key={phase.label} className="flex flex-col items-center relative z-10">
+                <motion.div
+                  className="relative"
+                  animate={{ y: [0, -6, 0], scale: [1, 1.15, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                >
+                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-lg`}>
+                    <span className="text-sm md:text-lg">{phase.icon}</span>
+                  </div>
+                  <motion.div
+                    className="absolute inset-0 rounded-full opacity-30"
+                    style={{ background: "inherit" }}
+                    animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                  />
+                </motion.div>
+                <motion.div
+                  className="mt-1 whitespace-nowrap"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.2 }}
+                >
+                  <div className="text-[9px] md:text-[10px] font-medium text-zinc-700 text-center">{phase.label}</div>
+                </motion.div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Deployment Pipeline Visualization */}
         <div className="mt-4 md:mt-6 grid grid-cols-3 gap-1 md:gap-2">
-          {['Dev', 'Stage', 'Prod'].map((env, i) => (
+          {['Dev', 'Stage', 'Vercel'].map((env, i) => (
             <motion.div
               key={env}
               className="bg-zinc-50 rounded md:rounded-md p-1.5 md:p-2 flex flex-col items-center"
@@ -490,12 +468,12 @@ const expertiseAreas = [
   },
   {
     title: "Backend Solido & Dati",
-    description: "Sviluppo di API robuste e logiche server-side efficienti. Utilizzo Node.js e Python per creare sistemi scalabili, abbinati alla potenza di PostgreSQL per una gestione dati sicura e strutturata.",
+    description: "Sviluppo di API robuste con Node.js, Python, C# e .NET. Integro LLM tramite API (OpenAI, Claude) per funzionalità AI native. Database relazionali con PostgreSQL per una gestione dati sicura e scalabile.",
     animation: BackendAnimation,
   },
   {
     title: "Soluzioni End-to-End",
-    description: "Visione completa del ciclo di vita del prodotto. Dallo schema al deployment, creo applicazioni web scalabili e ad alte prestazioni, garantendo coerenza e manutenibilità in ogni fase.",
+    description: "Visione completa del ciclo di vita del prodotto. Dallo schema al deployment su Vercel, creo applicazioni web scalabili e ad alte prestazioni, garantendo coerenza e manutenibilità in ogni fase.",
     animation: EndToEndAnimation,
   },
 ];
@@ -628,7 +606,7 @@ export default function Expertise() {
             willChange: "transform, opacity"
           }}
           style={{ perspective: "1500px" }}
-          className="w-full max-w-[min(98vw,180rem)] h-auto md:min-h-[60vh] md:max-h-[80vh] 2xl:min-h-[75vh] 2xl:max-h-[90vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
+          className="w-full max-w-[min(98vw,180rem)] h-auto md:min-h-[60vh] md:max-h-[80vh] 2xl:min-h-[85vh] 2xl:max-h-[92vh] flex flex-col bg-white rounded-[clamp(0.5rem,2vw,3rem)] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-200/50 overflow-hidden transform-gpu"
         >
           {/* Window Header */}
           <div className="bg-white/80 backdrop-blur-md border-b border-zinc-200/50 px-[clamp(1rem,2vw,2.5rem)] py-[clamp(0.5rem,1vw,1.25rem)] flex items-center gap-[clamp(0.5rem,0.8vw,1.5rem)] sticky top-0 z-10">
@@ -660,8 +638,8 @@ export default function Expertise() {
                 style={{ willChange: "transform, opacity, filter" }}
               >
                 {/* Animation Container */}
-                <div className="w-full h-[18rem] flex items-center justify-center relative mb-4">
-                  <div className="w-full">
+                <div className="w-full h-[18rem] 2xl:h-[clamp(22rem,35vh,50rem)] flex items-center justify-center relative mb-4">
+                  <div className="w-full h-full">
                     <area.animation />
                   </div>
                 </div>
