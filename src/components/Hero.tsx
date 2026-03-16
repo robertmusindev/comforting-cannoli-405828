@@ -153,10 +153,14 @@ export function Hero() {
 
       {/* Core centered content */}
       <div className="relative z-10 w-full px-[clamp(1.5rem,4vw,6rem)] flex flex-col items-center justify-center text-center">
-        {/* Mobile-only heading: "Robert Musin, full stack developer" */}
-        <div className="md:hidden text-[clamp(2.2rem,7vw,3.5rem)] font-medium tracking-tighter leading-tight text-zinc-900 text-center mb-[clamp(0.75rem,2vw,1.25rem)]">
-          Robert Musin,{" "}
-          <span className="underline decoration-zinc-900 underline-offset-4">full stack developer</span>
+        {/* Mobile-only heading */}
+        <div className="md:hidden text-center mb-[clamp(0.75rem,2vw,1.25rem)]">
+          <div className="text-[clamp(2.2rem,7vw,3.5rem)] font-medium tracking-tighter leading-tight text-zinc-900">
+            Robert Musin
+          </div>
+          <div className="text-[clamp(1.4rem,4.5vw,2.2rem)] font-medium tracking-tight leading-tight mt-1">
+            <span className="bg-zinc-100 text-zinc-700 px-3 py-1 rounded-md">Full Stack Developer</span>
+          </div>
         </div>
 
         {/* Desktop animated h1 */}
@@ -200,6 +204,7 @@ export function Hero() {
           <span className="underline decoration-zinc-500 underline-offset-4">scalabili</span>{" "}
           e{" "}
           <span className="underline decoration-zinc-500 underline-offset-4">performanti</span>.
+          <br className="md:hidden" />
         </motion.p>
 
         <motion.div
